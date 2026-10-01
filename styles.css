@@ -164,14 +164,69 @@ p { margin: 0; }
   font-size: 11px;
   padding: 12px 28px;
 }
-.btn--primary:hover {
-  background: var(--color-gold);
-  color: var(--color-black);
-  transition: 0.4s ease;
-}
 .btn--secondary { border-color: var(--color-ivory); }
-.btn--secondary:hover { background: var(--color-ivory); color: var(--color-black); }
 .btn--large { padding: 1.2rem 3.5rem; }
+
+/* --- TOUCH PARITY --- */
+/* touch-action:manipulation removes the legacy 300ms tap delay; the tap-highlight
+   reset stops iOS painting a grey flash over every tappable element. */
+.btn,
+.nav-link,
+.lang-btn,
+.footer__link,
+.dynamic-slider__arrow,
+.dynamic-slider__dot,
+.hero-social__link,
+.whatsapp-float {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* :hover is only honoured where a real pointer exists. Left unguarded, a tap
+   leaves the hover state stuck on the element after the finger lifts. */
+@media (hover: hover) {
+  .btn--primary:hover {
+    background: var(--color-gold);
+    color: var(--color-black);
+    transition: 0.4s ease;
+  }
+  .btn--secondary:hover { background: var(--color-ivory); color: var(--color-black); }
+  .brand-logos__item:hover { transform: scale(1.1); }
+  .dynamic-slider__arrow:hover { background: var(--color-gold); color: #000; }
+  .whatsapp-float:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+  }
+  .nav-link:hover { color: var(--color-ivory); }
+  .lang-btn:hover { color: var(--color-gold); }
+  .hero-social__link:hover,
+  a.location__detail-value:hover,
+  .contact-modal__link:hover,
+  .footer__link:hover { color: var(--color-gold); }
+  .menu-modal__close:hover,
+  .booking-modal__close:hover,
+  .history-modal__close:hover,
+  .contact-modal__close:hover { color: var(--color-gold); }
+}
+
+/* a tap gets the same feedback a desktop mouse gets from :hover */
+.btn--primary:active,
+.btn--primary:focus-visible { background: var(--color-gold); color: var(--color-black); }
+.btn--secondary:active,
+.btn--secondary:focus-visible { background: var(--color-ivory); color: var(--color-black); }
+.btn:active,
+.dynamic-slider__arrow:active { transform: translateY(1px); }
+.dynamic-slider__arrow:active { background: var(--color-gold); color: #000; }
+.brand-logos__item:active { transform: scale(1.06); }
+.hero-social__link:active,
+.lang-btn:active,
+.footer__link:active,
+a.location__detail-value:active,
+.contact-modal__link:active,
+.menu-modal__close:active,
+.booking-modal__close:active,
+.history-modal__close:active,
+.contact-modal__close:active { color: var(--color-gold); }
 
 /* --- HEADER & NAV --- */
 .site-header {
@@ -196,6 +251,12 @@ p { margin: 0; }
   left:0;
  z-index: 100;
  background-color: #0707076e;
+  /* full-width fixed strip: only its real controls should catch taps */
+  pointer-events: none;
+}
+
+.nav-container > * {
+  pointer-events: auto;
 }
 
 .logo__text {
@@ -206,10 +267,6 @@ p { margin: 0; }
   font-weight: 500;
   color: var(--color-gold);
   transition: color var(--transition-fast);
-}
-
-.logo__text:hover {
-  color: var(--color-gold);
 }
 
 .main-nav {
@@ -236,10 +293,6 @@ p { margin: 0; }
   cursor: pointer;
   padding-left: 0;
   padding-right: 0;
-}
-
-.nav-link:hover {
-  color: var(--color-ivory);
 }
 
 .nav-link--active {
@@ -276,7 +329,6 @@ p { margin: 0; }
   transition: color var(--transition-fast);
 }
 
-.lang-btn:hover,
 .lang-btn.active {
   color: var(--color-gold);
 }
@@ -342,10 +394,6 @@ p { margin: 0; }
   line-height: 1;
 }
 
-.hero-social__link:hover {
-  color: var(--color-gold);
-}
-
 /* --- BRAND LOGOS ROW --- */
 .brand-logos {
   display: flex;
@@ -368,10 +416,6 @@ p { margin: 0; }
   flex-shrink: 0;
   transition: transform 0.3s ease;
   opacity: 0;
-}
-
-.brand-logos__item:hover {
-  transform: scale(1.1);
 }
 
 .brand-logos__img {
@@ -427,10 +471,14 @@ p { margin: 0; }
   will-change: transform;
 }
 
+/* Full-bleed scrim: paint only, never a hit target. Without this it swallows
+   every tap on the hero on mobile, where `display:contents` on .hero__content
+   removes the z-index that used to keep the CTAs above it. */
 .hero__overlay {
   position: absolute;
   inset: 0;
   background: rgba(10, 10, 10, 0.4);
+  pointer-events: none;
 }
 
 .header-location-tag {
@@ -547,7 +595,9 @@ p { margin: 0; }
 
 /* --- INTRO --- */
 .intro {
-  padding-top: var(--section-pad);
+  /* 1rem on every breakpoint (not --section-pad) so the seam below the hero is
+     the same tight 16px on mobile as it is on desktop */
+  padding-top: 1rem;
   position: relative;
   overflow: hidden;
 }
@@ -596,13 +646,6 @@ p { margin: 0; }
   width: 70px;
   height: 1px;
   background: var(--color-gold);
-}
-
-/* --- INTRO - DESKTOP OVERRIDES (must come AFTER base rules) --- */
-@media (min-width: 769px) {
-  .intro {
-    padding-top: 1rem;
-  }
 }
 
 .intro__text {
@@ -973,7 +1016,6 @@ p { margin: 0; }
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 
-.dynamic-slider__arrow:hover { background: var(--color-gold); color: #000; }
 .dynamic-slider__arrow:focus-visible,
 .dynamic-slider__dot:focus-visible { outline: 1px solid var(--color-gold); outline-offset: 3px; }
 
@@ -1087,10 +1129,6 @@ p { margin: 0; }
   transition: color var(--transition-fast);
 }
 
-a.location__detail-value:hover {
-  color: var(--color-gold);
-}
-
 .location__parking {
   font-size: 0.85rem;
   color: var(--color-mat-white);
@@ -1189,10 +1227,6 @@ a.location__detail-value:hover {
   transition: color var(--transition-fast);
 }
 
-.menu-modal__close:hover {
-  color: var(--color-gold);
-}
-
 .menu-modal__title {
   font-size: 1.6rem;
   color: var(--color-gold);
@@ -1249,10 +1283,6 @@ a.location__detail-value:hover {
   font-size: 1.5rem;
   cursor: pointer;
   transition: color var(--transition-fast);
-}
-
-.booking-modal__close:hover {
-  color: var(--color-gold);
 }
 
 .booking-modal__title {
@@ -1385,10 +1415,6 @@ a.location__detail-value:hover {
   transition: color var(--transition-fast);
 }
 
-.history-modal__close:hover {
-  color: var(--color-gold);
-}
-
 .history-modal__card {
   background: var(--color-charcoal);
   border: 1px solid rgba(201, 169, 110, 0.25);
@@ -1478,10 +1504,6 @@ a.location__detail-value:hover {
   transition: color var(--transition-fast);
 }
 
-.contact-modal__close:hover {
-  color: var(--color-gold);
-}
-
 .contact-modal__card {
   background: var(--color-charcoal);
   border: 1px solid rgba(201, 169, 110, 0.25);
@@ -1532,10 +1554,6 @@ a.location__detail-value:hover {
   transition: color var(--transition-fast);
 }
 
-.contact-modal__link:hover {
-  color: var(--color-gold);
-}
-
 .contact-modal__btn {
   display: inline-block;
   text-decoration: none;
@@ -1568,11 +1586,6 @@ a.location__detail-value:hover {
   box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-decoration: none;
-}
-
-.whatsapp-float:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
 }
 
 /* --- FOOTER --- */
@@ -1633,7 +1646,6 @@ a.location__detail-value:hover {
   padding: 0;
   font: inherit;
 }
-.footer__link:hover { color: var(--color-ivory); }
 .footer__hours-day,
 .footer__hours-value { display: block; font-size: 0.85rem; }
 .footer__hours-value { color: var(--color-medium-gray); }
@@ -1725,15 +1737,40 @@ a.location__detail-value:hover {
 
 /* --- MOBILE HERO STACK (max-width: 768px; additive overrides, desktop untouched) --- */
 @media (max-width: 768px) {
-  /* stack the hero as a centered column; grows beyond one screen instead of clipping */
+  /* stack the hero as a centered column; sized by its content instead of
+     clipping — a reserved 100svh pooled dead space under the logo row, which
+     read as a gap before the photo section below */
   .hero {
     flex-direction: column;
     align-items: center;
     height: auto;
-    min-height: 100svh;
+    min-height: 0;
     padding-top: 5.5rem;
-    padding-bottom: 3rem;
+    padding-bottom: 0;
     text-align: center;
+  }
+
+  /* `display: contents` below dissolves .hero__content's box, so its desktop
+     `position: relative; z-index: 1` is lost and the z-auto .hero__bg scrim
+     paints over — and eats taps on — the CTAs. Re-establish the stacking. */
+  .hero__bg { z-index: 0; }
+
+  .header-location-tag,
+  .hero__title,
+  .hero__subtitle,
+  .hero__actions,
+  .brand-logos,
+  .hero-video-container {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* interactive hero content explicitly re-armed for touch (the video circle
+     keeps the base pointer-events:none; only its social links are clickable) */
+  .hero__actions,
+  .hero-social,
+  .hero-social__link {
+    pointer-events: auto;
   }
 
   /* decorative left fish: sits lower on mobile so it reads comfortably */
@@ -1804,7 +1841,7 @@ a.location__detail-value:hover {
 @media (max-width: 480px) {
   .hero {
     padding-top: 5rem;
-    padding-bottom: 2.5rem;
+    padding-bottom: 0;
   }
 
   .hero-video-container__circle {
@@ -1820,7 +1857,7 @@ a.location__detail-value:hover {
 @media (max-width: 390px) {
   .hero {
     padding-top: 4.5rem;
-    padding-bottom: 2.25rem;
+    padding-bottom: 0;
   }
 
   /* overrides the older display:none so the video stays visible on small phones */
