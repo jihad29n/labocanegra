@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LA BOCA NEGRA | Restaurant Italien Espagnol à Tanger</title>
+  <meta name="description" content="LA BOCA NEGRA — Restaurant italien espagnol de luxe à Tanger, Maroc. Cuisine méditerranéenne raffinée, fruits de mer, pâtes artisanales et grillades au feu de bois.">
+  <meta name="keywords" content="restaurant tanger, italien espagnol, cuisine méditerranéenne, la boca negra, restaurant luxe tanger maroc, fruits de mer, pizza, pâtes">
+  <meta name="author" content="LA BOCA NEGRA">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="LA BOCA NEGRA | Restaurant Italien Espagnol à Tanger">
+  <meta property="og:description" content="Restaurant italien espagnol de luxe à Tanger. Cuisine méditerranéenne raffinée dans un cadre cinématographique.">
+  <meta property="og:image" content="image/images (1).jfif">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="LA BOCA NEGRA">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="image/la-boca-negra-ITALIAN-SPANISH-RESTAURANT-02.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Three.js r0.143.0 (ES module import map for the starfield backdrop) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.143.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.143.0/examples/jsm/"
+    }
+  }
+  </script>
+  <!-- Preload the whole module graph so the CDN waterfall runs in parallel with
+       HTML parsing instead of resolving one dependent import at a time -->
+  <link rel="modulepreload" crossorigin href="https://unpkg.com/three@0.143.0/build/three.module.js">
+  <link rel="modulepreload" crossorigin href="https://unpkg.com/three@0.143.0/examples/jsm/postprocessing/EffectComposer.js">
+  <link rel="modulepreload" crossorigin href="https://unpkg.com/three@0.143.0/examples/jsm/postprocessing/RenderPass.js">
+  <link rel="modulepreload" crossorigin href="https://unpkg.com/three@0.143.0/examples/jsm/postprocessing/UnrealBloomPass.js">
+  <link rel="modulepreload" crossorigin href="https://unpkg.com/three@0.143.0/examples/jsm/postprocessing/ShaderPass.js">
+  <link rel="modulepreload" crossorigin href="https://unpkg.com/three@0.143.0/examples/jsm/postprocessing/MaskPass.js">
+  <link rel="modulepreload" crossorigin href="https://unpkg.com/three@0.143.0/examples/jsm/postprocessing/Pass.js">
+  <link rel="modulepreload" crossorigin href="https://unpkg.com/three@0.143.0/examples/jsm/shaders/CopyShader.js">
+  <link rel="modulepreload" crossorigin href="https://unpkg.com/three@0.143.0/examples/jsm/shaders/LuminosityHighPassShader.js">
+</head>
+<body>
+
+  <!-- ================================================ -->
+  <!-- GLOBAL STARFIELD BACKDROP (three.js)             -->
+  <!-- Fixed + z-index:-1 so it sits behind every       -->
+  <!-- section and overlay site-wide. starfield.js       -->
+  <!-- creates the WebGL context on page load and fades  -->
+  <!-- it in.                                            -->
+  <!-- ================================================ -->
+  <canvas class="site-starfield" data-starfield aria-hidden="true"></canvas>
+
+  <!-- Skip to main content -->
+  <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
+  <!-- ============================== -->
+  <!-- HEADER & NAVIGATION            -->
+  <!-- ============================== -->
+
+  <header class="site-header" id="site-header">
+    <div class="nav-container">
+
+      <!-- Logo -->
+      <a href="index.html" class="logo" aria-label="LA BOCA NEGRA — Accueil">
+        <span class="logo__text">LA BOCA NEGRA</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="main-nav" aria-label="Navigation principale">
+        <ul class="main-nav__list">
+          <li class="main-nav__item">
+            <a href="index.html" class="nav-link nav-link--active" data-i18n="nav.home">ACCUEIL</a>
+          </li>
+          <li class="main-nav__item">
+            <button type="button" class="nav-link open-menu-modal" data-i18n="nav.menu">LA CARTE</button>
+          </li>
+          <li class="main-nav__item">
+            <button type="button" class="nav-link open-history-modal" data-i18n="nav.about">L'HISTOIRE</button>
+          </li>
+          <li class="main-nav__item">
+            <button type="button" class="nav-link open-contact-modal" data-i18n="nav.contact">CONTACT</button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Actions: Language + Reserve + Hamburger -->
+      <div class="nav-actions">
+
+        <!-- Language Switcher -->
+        <div class="lang-switcher" role="group" aria-label="Sélection de langue">
+          <button class="lang-btn active" data-lang="fr" aria-label="Français">FR</button>
+          <span class="lang-switcher__sep" aria-hidden="true">|</span>
+          <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+          <span class="lang-switcher__sep" aria-hidden="true">|</span>
+          <button class="lang-btn" data-lang="it" aria-label="Italiano">IT</button>
+          <span class="lang-switcher__sep" aria-hidden="true">|</span>
+          <button class="lang-btn" data-lang="es" aria-label="Español">ES</button>
+          <span class="lang-switcher__sep" aria-hidden="true">|</span>
+          <button class="lang-btn" data-lang="ar" aria-label="العربية">AR</button>
+        </div>
+
+        <!-- Reserve CTA -->
+            <button type="button" class="btn btn--primary nav-cta" data-i18n="nav.reserve" id="open-booking-modal">RÉSERVER</button>
+
+      </div>
+
+    </div>
+
+  </header>
+
+  <!-- ============================== -->
+  <!-- MAIN CONTENT                   -->
+  <!-- ============================== -->
+  <main id="main-content">
+
+    <!-- ============================================ -->
+    <!-- HERO SECTION                                 -->
+    <!-- ============================================ -->
+    <section class="hero" id="hero" aria-label="Accueil">
+      <img src="image/fish-left.png" alt="" class="hero-bg-fish" aria-hidden="true">
+      <div class="hero__bg">
+        <img src="image/images/MAP-LA-BOCA-NEGRA-q6tuf6nypdtixovfsem1yc3w9scp492bz38pxdx480.PNG"
+         alt="" class="hero__bg-img" loading="eager">
+        <div class="hero__overlay" aria-hidden="true"></div>
+      </div>
+
+      <!-- Video Box + Social Icons -->
+      <div class="hero-video-container" aria-hidden="true">
+        <div class="hero-video-container__circle">
+          <video class="hero-video-container__video" autoplay loop muted playsinline aria-hidden="true">
+            <source src="video/video1.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="hero-social" role="group" aria-label="Réseaux sociaux">
+          <a href="https://www.instagram.com/labocanegratanger" class="hero-social__link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="https://www.web.facebook.com/photo/?fbid=285219287798459&set=a.285219314465123&locale=ar_AR" class="hero-social__link" aria-label="Facebook" target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a href="#" class="hero-social__link" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="header-location-tag" aria-hidden="true">
+        <span data-i18n="hero.eyebrow">TANGER · MAROC</span>
+      </div>
+      <div class="hero__content">
+        <h1 class="hero__title">LA BOCA NEGRA</h1>
+        <p class="hero__subtitle" data-i18n="hero.subtitle">RESTAURANT ITALIEN ESPAGNOL</p>
+
+        <div class="hero__actions">
+          <button type="button" class="btn btn--primary" data-i18n="hero.reserve" id="open-booking-modal">RÉSERVER UNE TABLE</button>
+          <button type="button" class="btn btn--secondary" data-i18n="hero.explore" id="open-menu-modal">DÉCOUVRIR LA CARTE</button>
+        </div>
+
+        <div class="brand-logos" role="group" aria-label="Partenaires">
+          <div class="brand-logos__item">
+            <img src="image/parmigiano.jfif" alt="Parmigiano" class="brand-logos__img">
+          </div>
+          <div class="brand-logos__item">
+            <img src="image/andinsky-ice-cream-factory.jfif" alt="Andinsky" class="brand-logos__img">
+          </div>
+          <div class="brand-logos__item">
+            <img src="image/kandinsky-plaza.png" alt="Kandinsky" class="brand-logos__img">
+          </div>
+          <div class="brand-logos__item">
+            <img src="image/boca1.png" alt="Boca" class="brand-logos__img">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- INTRODUCTION SECTION                         -->
+    <!-- ============================================ -->
+    <section class="intro section" id="intro" aria-labelledby="intro-title">
+      <img src="image/fish-right.png" alt="" class="intro-bg-fish--right" aria-hidden="true">
+      <div class="container">
+        <div class="intro__grid">
+            <div class="intro__image">
+              <img src="image/table.png" alt="" class="intro__img">
+            </div>
+            <div class="intro__content">
+              <div class="intro__top-headings">
+                <div class="section-label section-label--left" aria-hidden="true">
+                  <span></span><span data-i18n="intro.label">NOTRE HISTOIRE</span><span></span>
+                </div>
+                <h3 class="intro__heading">LA BOCA NEGRA</h3>
+              </div>
+              <span class="intro__title-line">
+                <span class="intro__title-line__dash"></span>
+                <span class="intro__title-line__text" data-i18n="intro.cuisine">Cuisine méditerranéenne</span>
+                <span class="intro__title-line__dash"></span>
+              </span>
+              <h2 class="kandinsky__title" data-i18n="intro.kandinsky_title">Nouveau restaurant par Kandinsky</h2>
+              <h3 class="intro__heading intro__heading--standalone">LA BOCA NEGRA</h3>
+              <p class="intro__text" data-i18n="intro.text1">
+               n'est pas simplement un restaurant — c'est une invitation au voyage. Chaque plat raconte une histoire, puisée dans les marchés vibrants de Rome, les tavernes authentiques de Séville et les ports intemporels de la Méditerranée. Dans un décor où le noir profond rencontre l'ivoire chaleureux, et où des lumières tamisées révèlent des textures nobles, nous façonnons des souvenirs qui persistent bien au-delà d'une simple expérience culinaire.
+              </p>
+              <div class="star-divider" aria-hidden="true"><span></span><i class="star">✦</i><span></span></div>
+            </div>
+          </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- DYNAMIC IMAGE SLIDER                          -->
+    <!-- ============================================ -->
+    <section class="dynamic-slider section" id="dynamic-slider" aria-labelledby="dynamic-slider-title" aria-roledescription="carrousel">
+      <div class="container">
+
+        <div class="section-header">
+          <span class="section-header__label" data-i18n="slider.label">EN IMAGES</span>
+          <h2 class="section-header__title" id="dynamic-slider-title" data-i18n="slider.title">Nos Plats Signature</h2>
+          <p class="section-header__subtitle" data-i18n="slider.subtitle">Faites défiler nos créations.</p>
+          <div class="section-header__divider" aria-hidden="true"></div>
+        </div>
+
+        <div class="dynamic-slider__viewport" data-slider-viewport>
+          <ul class="dynamic-slider__track" data-slider-track>
+            <li class="dynamic-slider__slide" style="--index:0; --image-url:url('image/BORATA.jpg')">
+              <figure class="dynamic-slider__card"></figure>
+            </li>
+            <li class="dynamic-slider__slide" style="--index:1; --image-url:url('image/B1.png')">
+              <figure class="dynamic-slider__card"></figure>
+            </li>
+            <li class="dynamic-slider__slide" style="--index:2; --image-url:url('image/disir.jpg')">
+              <figure class="dynamic-slider__card"></figure>
+            </li>
+            <li class="dynamic-slider__slide" style="--index:3; --image-url:url('image/CARPATCHO.jpg')">
+              <figure class="dynamic-slider__card"></figure>
+            </li>
+            <li class="dynamic-slider__slide" style="--index:4; --image-url:url('image/pat.jpeg')">
+              <figure class="dynamic-slider__card"></figure>
+            </li>
+            <li class="dynamic-slider__slide" style="--index:5; --image-url:url('image/polpol.jpg')">
+              <figure class="dynamic-slider__card"></figure>
+            </li>
+            <li class="dynamic-slider__slide" style="--index:6; --image-url:url('image/pizza.jpg')">
+              <figure class="dynamic-slider__card"></figure>
+            </li>
+            <li class="dynamic-slider__slide" style="--index:7; --image-url:url('image/soboco.jpeg')">
+              <figure class="dynamic-slider__card"></figure>
+            </li>
+            <li class="dynamic-slider__slide" style="--index:8; --image-url:url('image/rezoto.jpg')">
+              <figure class="dynamic-slider__card"></figure>
+            </li>
+            <li class="dynamic-slider__slide" style="--index:9; --image-url:url('image/SOMO.jpg')">
+              <figure class="dynamic-slider__card"></figure>
+            </li>
+            <li class="dynamic-slider__slide" style="--index:10; --image-url:url('image/BANDIKHA.jpeg')">
+              <figure class="dynamic-slider__card"></figure>            </li>
+          </ul>
+        </div>
+
+        <div class="dynamic-slider__controls">
+          <button type="button" class="dynamic-slider__arrow" data-slider-prev aria-label="Plat précédent">&#8249;</button>
+          <div class="dynamic-slider__dots" data-slider-dots role="group" aria-label="Aller à un plat"></div>
+          <button type="button" class="dynamic-slider__arrow" data-slider-next aria-label="Plat suivant">&#8250;</button>
+        </div>
+
+        <p class="dynamic-slider__status" data-slider-status aria-live="polite" aria-atomic="true"></p>
+
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- KANDINSKY SECTION                            -->
+    <!-- ============================================ -->
+    <section class="kandinsky section" id="kandinsky">
+      <div class="container">
+        <div class="kandinsky__grid">
+          <div class="kandinsky__video">
+            <video class="kandinsky__player" autoplay loop muted playsinline>
+              <source src="video/video6.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="kandinsky__content">
+            <div class="tagline-bar" aria-hidden="true">
+              <span></span><span data-i18n="kandinsky.tagline">Créer • Partager • Émotion</span><span></span>
+            </div>
+            <p class="kandinsky__specialties" data-i18n="kandinsky.specialties">Pizza – Pâtes – Viande – Poisson – Tapas – Paella</p>
+            <div class="star-divider" aria-hidden="true"><span></span><i class="star">✦</i><span></span></div>
+            <p class="kandinsky__text" data-i18n="kandinsky.text">
+              La Boca Negra est un restaurant de fusion méditerranéenne unique, où notre passion pour les fruits de mer et les viandes de première qualité constitue la clé de notre succès. Nos clients nous rejoignent pour un déjeuner ou un dîner. Pour nous, la gastronomie va bien au-delà de la nourriture et des boissons : nous mettons tout notre cœur au service de l'expérience globale.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- LOCATION & MAP SECTION                       -->
+    <!-- ============================================ -->
+    <section class="location section" id="location" aria-labelledby="location-title">
+      <div class="container">
+
+        <div class="section-header">
+          <span class="section-header__label" data-i18n="location.label">NOTRE EMPLACEMENT</span>
+          <h2 class="section-header__title" id="location-title" data-i18n="location.title">
+            Tanger, Là Où La Méditerranée Commence
+          </h2>
+          <p class="section-header__subtitle" data-i18n="location.subtitle">
+            Niché dans les ruelles vibrantes de Tanger
+          </p>
+          <div class="section-header__divider" aria-hidden="true"></div>
+        </div>
+
+        <div class="location__grid">
+
+          <div class="location__content">
+            <p class="location__text" data-i18n="location.text">
+              LA BOCA NEGRA incarne la rencontre entre traditions méditerranéennes et modernité. Un lieu où le passé et le futur se rejoignent dans chaque bouchée, au cœur de la ville tanger.
+            </p>
+
+            <div class="location__details">
+              <div class="location__detail">
+                <span class="location__detail-label" data-i18n="location.phone_label">TÉLÉPHONE</span>
+                <a href="tel:+212667057318" class="location__detail-value">+212 6 67 05 73 18</a>
+              </div>
+              <div class="location__detail">
+                <span class="location__detail-label" data-i18n="contact.email_label">E-MAIL</span>
+                <a href="mailto:labocanegratanger@gmail.com" class="location__detail-value">labocanegratanger@gmail.com</a>
+              </div>
+              <div class="location__detail">
+                <span class="location__detail-label" data-i18n="location.hours_label">HORAIRES</span>
+                <span class="location__detail-value" data-i18n="location.hours_value">Tous les jours · 13h00 – 01h00</span>
+              </div>
+            </div>
+
+            <p class="location__parking" data-i18n="location.parking">Parking sûr et disponible devant l'hôtel Barceló. Le parking P9 se situe à 1 minute à pied du restaurant.</p>
+
+            <div class="location__cta">
+              <button type="button" class="btn btn--primary btn--large" data-i18n="location.cta" id="open-booking-modal">RÉSERVER UNE TABLE</button>
+            </div>
+          </div>
+
+          <div class="location__media">
+            <div class="location__gallery">
+              <div class="location__img-box">
+                <img src="image/MAP1.jpg" alt="Carte 1 de LA BOCA NEGRA" class="location__img" loading="lazy">
+              </div>
+              <div class="location__img-box">
+                <img src="image/map2.jpeg" alt="Carte 2 de LA BOCA NEGRA" class="location__img" loading="lazy">
+              </div>
+            </div>
+            <div class="location__map-embed">
+              <iframe
+                src="https://maps.google.com/maps?q=La+Boca+Negra+Tanger&t=&z=17&ie=UTF8&iwloc=&output=embed"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Localisation de LA BOCA NEGRA à Tanger">
+              </iframe>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================== -->
+  <!-- FOOTER                         -->
+  <!-- ============================== -->
+  <footer class="site-footer" id="footer">
+    <div class="container">
+
+      <div class="footer__grid">
+
+        <!-- Brand Column -->
+        <div class="footer__brand">
+          <h3 class="footer__brand-name">LA BOCA NEGRA</h3>
+          <p class="footer__brand-tagline" data-i18n="hero.subtitle">RESTAURANT ITALIEN ESPAGNOL</p>
+          <p class="footer__brand-location" data-i18n="footer.location">TANGER · MAROC</p>
+        </div>
+
+        <!-- Navigation Column -->
+        <div class="footer__nav">
+          <h4 class="footer__heading" data-i18n="footer.nav">Navigation</h4>
+          <ul class="footer__list">
+            <li><a href="index.html" class="footer__link" data-i18n="nav.home">ACCUEIL</a></li>
+            <li><button type="button" class="footer__link open-menu-modal" data-i18n="nav.menu">LA CARTE</button></li>
+            <li><button type="button" class="footer__link open-history-modal" data-i18n="nav.about">L'HISTOIRE</button></li>
+            <li><button type="button" class="footer__link open-contact-modal" data-i18n="nav.contact">CONTACT</button></li>
+          </ul>
+        </div>
+
+        <!-- Hours Column -->
+        <div class="footer__hours">
+          <h4 class="footer__heading" data-i18n="footer.hours">Horaires</h4>
+          <ul class="footer__list">
+            <li>
+              <span class="footer__hours-day" data-i18n="footer.mon_thu">Lundi – Jeudi</span>
+              <span class="footer__hours-value" data-i18n="footer.hours_value">[13h00-01h00]</span>
+            </li>
+            <li>
+              <span class="footer__hours-day" data-i18n="footer.fri_sat">Vendredi – Samedi</span>
+              <span class="footer__hours-value" data-i18n="footer.hours_value">[13h00-01h00]</span>
+            </li>
+            <li>
+              <span class="footer__hours-day" data-i18n="footer.sun">Dimanche</span>
+              <span class="footer__hours-value" data-i18n="footer.hours_value">[13h00-01h00]</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Reserve & Social Column -->
+        <div class="footer__reserve">
+          <button type="button" class="btn btn--primary footer__cta" data-i18n="nav.reserve" id="open-booking-modal">RÉSERVER</button>
+        </div>
+
+      </div>
+
+      <div class="footer__bottom">
+        <p class="footer__copyright">&copy; 2026 LA BOCA NEGRA. <span data-i18n="footer.rights">Tous droits réservés.</span></p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Menu Modal -->
+  <div class="menu-modal" id="menu-modal" role="dialog" aria-modal="true" aria-labelledby="menu-modal-title" hidden>
+    <div class="menu-modal__overlay" id="menu-modal-overlay"></div>
+    <div class="menu-modal__content">
+      <button type="button" class="menu-modal__close" id="close-menu-modal" aria-label="Fermer">&times;</button>
+      <h2 class="menu-modal__title" id="menu-modal-title" data-i18n="menu.title">LA CARTE</h2>
+      <div class="menu-modal__buttons">
+        <a href="PDF/Mtg-menu-boca-negra_compressed-es-ita.pdf" target="_blank" rel="noopener noreferrer" class="btn btn--primary menu-modal__btn" data-i18n="menu.btn_fr_es">FR / ES</a>
+        <a href="PDF/Mtg-menu-boca-negra-hollandais-anglais_compressed-fr.pdf" target="_blank" rel="noopener noreferrer" class="btn btn--primary menu-modal__btn" data-i18n="menu.btn_en_nl">EN / NL</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- WhatsApp Float -->
+  <a href="https://wa.me/212667057318" target="_blank" rel="noopener noreferrer" class="whatsapp-float" aria-label="Contacter sur WhatsApp">
+    <svg viewBox="0 0 32 32" fill="currentColor" width="28" height="28">
+      <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16c0 3.5 1.132 6.744 3.058 9.374L1.054 31.25l6.118-1.97A15.907 15.907 0 0016.004 32C24.826 32 32 24.822 32 16S24.826 0 16.004 0zm9.326 22.594c-.39 1.094-1.93 2.004-3.142 2.27-.834.18-1.922.322-5.598-1.204-4.706-1.95-7.726-6.73-7.958-7.042-.224-.312-1.834-2.44-1.834-4.656 0-2.214 1.16-3.3 1.572-3.764.39-.434.936-.558 1.246-.558.15 0 .282.008.402.014.39.018.586.04.842.63.326.748 1.112 2.7 1.208 2.9.096.2.16.434.032.7-.12.274-.18.444-.358.684-.18.24-.378.536-.54.72-.18.198-.366.41-.156.79.21.38.932 1.54 2 2.5 1.36 1.226 2.51 1.606 2.878 1.782.368.176.58.148.792-.088.214-.236.904-1.054 1.144-1.414.236-.36.474-.302.802-.182.33.12 2.086.984 2.444 1.164.358.18.598.27.686.42.09.144.09.834-.3 1.928z"/>
+    </svg>
+  </a>
+
+  <!-- Booking Modal -->
+  <div class="booking-modal" id="booking-modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title" hidden>
+    <div class="booking-modal__overlay" id="booking-modal-overlay"></div>
+    <div class="booking-modal__content">
+      <button type="button" class="booking-modal__close" id="close-booking-modal" aria-label="Fermer">&times;</button>
+      <h2 class="booking-modal__title" id="booking-modal-title" data-i18n="booking.title">RÉSERVER UNE TABLE</h2>
+
+      <form class="booking-modal__form" id="booking-form" novalidate>
+        <div class="booking-modal__field">
+          <label class="booking-modal__label" for="booking-name" data-i18n="booking.name_label">NOM</label>
+          <input type="text" id="booking-name" class="booking-modal__input" data-i18n-placeholder="booking.name_placeholder" placeholder="Votre nom" required>
+        </div>
+        <div class="booking-modal__field">
+          <label class="booking-modal__label" for="booking-phone" data-i18n="booking.phone_label">TÉLÉPHONE</label>
+          <input type="tel" id="booking-phone" class="booking-modal__input" data-i18n-placeholder="booking.phone_placeholder" placeholder="+212 6 00 00 00 00" required>
+        </div>
+        <div class="booking-modal__row">
+          <div class="booking-modal__field">
+            <label class="booking-modal__label" for="booking-guests" data-i18n="booking.guests_label">INVITÉS</label>
+            <select id="booking-guests" class="booking-modal__input" required>
+              <option value="" disabled selected data-i18n="booking.guests_placeholder">Nombre</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7+</option>
+            </select>
+          </div>
+          <div class="booking-modal__field">
+            <label class="booking-modal__label" for="booking-date" data-i18n="booking.date_label">DATE</label>
+            <input type="date" id="booking-date" class="booking-modal__input" required>
+          </div>
+          <div class="booking-modal__field">
+            <label class="booking-modal__label" for="booking-time" data-i18n="booking.time_label">HEURE</label>
+            <select id="booking-time" class="booking-modal__input" required>
+              <option value="" disabled selected data-i18n="booking.time_placeholder">Choisir l'heure</option>
+              <option value="13:00">13:00</option>
+              <option value="14:00">14:00</option>
+              <option value="15:00">15:00</option>
+              <option value="16:00">16:00</option>
+              <option value="17:00">17:00</option>
+              <option value="18:00">18:00</option>
+              <option value="19:00">19:00</option>
+              <option value="20:00">20:00</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="booking-modal__error" id="booking-error" hidden></div>
+        <div class="booking-modal__success" id="booking-success" hidden>
+          <p data-i18n="booking.success">Merci ! Votre demande de réservation a été enregistrée.</p>
+          <p class="booking-modal__success-sub" data-i18n="booking.success_sub">Redirection vers WhatsApp...</p>
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--large booking-modal__submit" id="booking-submit" data-i18n="booking.submit">CONFIRMER LA RÉSERVATION</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- History Modal -->
+  <div class="history-modal" id="history-modal" role="dialog" aria-modal="true" aria-labelledby="history-modal-title" hidden>
+    <div class="history-modal__overlay" id="history-modal-overlay"></div>
+    <div class="history-modal__content">
+      <button type="button" class="history-modal__close" id="close-history-modal" aria-label="Fermer">&times;</button>
+      <div class="history-modal__card">
+        <h2 class="history-modal__title" id="history-modal-title" data-i18n="history.title">L'HISTOIRE</h2>
+        <div class="history-modal__divider" aria-hidden="true"></div>
+        <p class="history-modal__text" data-i18n="history.text">
+          Bienvenue à La Boca Negra, une escale où la gastronomie devient un voyage sensoriel entre les saveurs vibrantes de Rome, l'âme des tavernes de Séville et la générosité de la Méditerranée. Pensé comme un écrin d'élégance aux tons sombres et chaleureux, notre restaurant célèbre la fusion culinaire à travers des viandes d'exception et des produits de la mer rigoureusement sélectionnés. De l'accueil au dernier instant, notre passion ne se limite pas à l'assiette : elle est façonnée pour vous offrir une expérience inoubliable, empreinte d'authenticité et d'excellence.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div class="contact-modal" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title" hidden>
+    <div class="contact-modal__overlay" id="contact-modal-overlay"></div>
+    <div class="contact-modal__content">
+      <button type="button" class="contact-modal__close" id="close-contact-modal" aria-label="Fermer">&times;</button>
+      <div class="contact-modal__card">
+        <h2 class="contact-modal__title" id="contact-modal-title" data-i18n="contact.title">CONTACT</h2>
+        <div class="contact-modal__divider" aria-hidden="true"></div>
+        <div class="contact-modal__info">
+          <p class="contact-modal__label" data-i18n="contact.address_label">Adresse</p>
+          <p class="contact-modal__value"><span data-i18n="contact.address_line1">Avenue Ludwig van Beethoven 3</span><br><span data-i18n="contact.address_line2">90000 Tanger, Maroc</span></p>
+        </div>
+        <div class="contact-modal__info">
+          <p class="contact-modal__label" data-i18n="contact.phone_label">Téléphone</p>
+          <a href="tel:+212667057318" class="contact-modal__value contact-modal__link">+212 6 67 05 73 18</a>
+        </div>
+        <div class="contact-modal__info">
+          <p class="contact-modal__label" data-i18n="contact.email_label">E-mail</p>
+          <a href="mailto:labocanegratanger@gmail.com" class="contact-modal__value contact-modal__link">labocanegratanger@gmail.com</a>
+        </div>
+        <div class="contact-modal__info">
+          <p class="contact-modal__label" data-i18n="contact.hours_label">Horaires</p>
+          <p class="contact-modal__value" data-i18n="contact.hours_value">Tous les jours — 13h00 à 01h00</p>
+        </div>
+        <a href="https://wa.me/212667057318" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--large contact-modal__btn" data-i18n="contact.whatsapp">Nous contacter via WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+  <script src="i18n.js"></script>
+  <!-- async: a deferred module would block DOMContentLoaded while the CDN fetches,
+       delaying the hero entrance and the slider on a slow connection -->
+  <script type="module" src="starfield.js" async></script>
+  
+</body>
+</html>
