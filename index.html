@@ -110,7 +110,7 @@
         </div>
 
         <!-- Reserve CTA -->
-            <button type="button" class="btn btn--primary nav-cta" data-i18n="nav.reserve" id="open-booking-modal">RÉSERVER</button>
+            <button type="button" class="btn btn--primary nav-cta" data-i18n="nav.reserve" data-open-booking>RÉSERVER</button>
 
       </div>
 
@@ -144,7 +144,7 @@
         <div class="hero-social" role="group" aria-label="Réseaux sociaux">
           <a href="https://www.instagram.com/labocanegratanger" class="hero-social__link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">Instagram</a>
           <a href="https://www.web.facebook.com/photo/?fbid=285219287798459&set=a.285219314465123&locale=ar_AR" class="hero-social__link" aria-label="Facebook" target="_blank" rel="noopener noreferrer">Facebook</a>
-          <a href="#" class="hero-social__link" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a href="https://wa.me/212614366681" class="hero-social__link" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">WhatsApp</a>
         </div>
       </div>
 
@@ -156,8 +156,11 @@
         <p class="hero__subtitle" data-i18n="hero.subtitle">RESTAURANT ITALIEN ESPAGNOL</p>
 
         <div class="hero__actions">
-          <button type="button" class="btn btn--primary" data-i18n="hero.reserve" id="open-booking-modal">RÉSERVER UNE TABLE</button>
-          <button type="button" class="btn btn--secondary" data-i18n="hero.explore" id="open-menu-modal">DÉCOUVRIR LA CARTE</button>
+          <div class="hero__actions__row">
+            <button type="button" class="btn btn--primary" data-i18n="hero.reserve" data-open-booking>RÉSERVER UNE TABLE</button>
+            <button type="button" class="btn btn--secondary" data-i18n="hero.explore" id="open-menu-modal">DÉCOUVRIR LA CARTE</button>
+          </div>
+          <a href="reservation.html" class="btn btn--secondary" data-i18n="hero.floorplan">CHOISIR VOTRE TABLE SUR LE PLAN</a>
         </div>
 
         <div class="brand-logos" role="group" aria-label="Partenaires">
@@ -323,7 +326,7 @@
             <div class="location__details">
               <div class="location__detail">
                 <span class="location__detail-label" data-i18n="location.phone_label">TÉLÉPHONE</span>
-                <a href="tel:+212667057318" class="location__detail-value">+212 6 67 05 73 18</a>
+                <a href="tel:+212614366681" class="location__detail-value">+212 6 14 36 66 81</a>
               </div>
               <div class="location__detail">
                 <span class="location__detail-label" data-i18n="contact.email_label">E-MAIL</span>
@@ -338,7 +341,7 @@
             <p class="location__parking" data-i18n="location.parking">Parking sûr et disponible devant l'hôtel Barceló. Le parking P9 se situe à 1 minute à pied du restaurant.</p>
 
             <div class="location__cta">
-              <button type="button" class="btn btn--primary btn--large" data-i18n="location.cta" id="open-booking-modal">RÉSERVER UNE TABLE</button>
+              <button type="button" class="btn btn--primary btn--large" data-i18n="location.cta" data-open-booking>RÉSERVER UNE TABLE</button>
             </div>
           </div>
 
@@ -419,7 +422,7 @@
 
         <!-- Reserve & Social Column -->
         <div class="footer__reserve">
-          <button type="button" class="btn btn--primary footer__cta" data-i18n="nav.reserve" id="open-booking-modal">RÉSERVER</button>
+          <button type="button" class="btn btn--primary footer__cta" data-i18n="nav.reserve" data-open-booking>RÉSERVER</button>
         </div>
 
       </div>
@@ -445,7 +448,7 @@
   </div>
 
   <!-- WhatsApp Float -->
-  <a href="https://wa.me/212667057318" target="_blank" rel="noopener noreferrer" class="whatsapp-float" aria-label="Contacter sur WhatsApp">
+  <a href="https://wa.me/212614366681" target="_blank" rel="noopener noreferrer" class="whatsapp-float" aria-label="Contacter sur WhatsApp">
     <svg viewBox="0 0 32 32" fill="currentColor" width="28" height="28">
       <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16c0 3.5 1.132 6.744 3.058 9.374L1.054 31.25l6.118-1.97A15.907 15.907 0 0016.004 32C24.826 32 32 24.822 32 16S24.826 0 16.004 0zm9.326 22.594c-.39 1.094-1.93 2.004-3.142 2.27-.834.18-1.922.322-5.598-1.204-4.706-1.95-7.726-6.73-7.958-7.042-.224-.312-1.834-2.44-1.834-4.656 0-2.214 1.16-3.3 1.572-3.764.39-.434.936-.558 1.246-.558.15 0 .282.008.402.014.39.018.586.04.842.63.326.748 1.112 2.7 1.208 2.9.096.2.16.434.032.7-.12.274-.18.444-.358.684-.18.24-.378.536-.54.72-.18.198-.366.41-.156.79.21.38.932 1.54 2 2.5 1.36 1.226 2.51 1.606 2.878 1.782.368.176.58.148.792-.088.214-.236.904-1.054 1.144-1.414.236-.36.474-.302.802-.182.33.12 2.086.984 2.444 1.164.358.18.598.27.686.42.09.144.09.834-.3 1.928z"/>
     </svg>
@@ -541,7 +544,7 @@
         </div>
         <div class="contact-modal__info">
           <p class="contact-modal__label" data-i18n="contact.phone_label">Téléphone</p>
-          <a href="tel:+212667057318" class="contact-modal__value contact-modal__link">+212 6 67 05 73 18</a>
+          <a href="tel:+212614366681" class="contact-modal__value contact-modal__link">+212 6 14 36 66 81</a>
         </div>
         <div class="contact-modal__info">
           <p class="contact-modal__label" data-i18n="contact.email_label">E-mail</p>
@@ -551,7 +554,7 @@
           <p class="contact-modal__label" data-i18n="contact.hours_label">Horaires</p>
           <p class="contact-modal__value" data-i18n="contact.hours_value">Tous les jours — 13h00 à 01h00</p>
         </div>
-        <a href="https://wa.me/212667057318" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--large contact-modal__btn" data-i18n="contact.whatsapp">Nous contacter via WhatsApp</a>
+        <a href="https://wa.me/212614366681" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--large contact-modal__btn" data-i18n="contact.whatsapp">Nous contacter via WhatsApp</a>
       </div>
     </div>
   </div>

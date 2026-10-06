@@ -41,7 +41,7 @@
 
     // Booking Modal
     const bookingModal = document.getElementById('booking-modal');
-    const openBookingBtns = document.querySelectorAll('#open-booking-modal');
+    const openBookingBtns = document.querySelectorAll('[data-open-booking]');
     const closeBookingBtn = document.getElementById('close-booking-modal');
     const bookingOverlay = document.getElementById('booking-modal-overlay');
     const bookingForm = document.getElementById('booking-form');
@@ -89,7 +89,7 @@
 
       // Time restriction: 13:00 – 20:00
       if (time < '13:00' || time > '20:00') {
-        bookingError.textContent = 'Les réservations en ligne sont clôturées après 20h en raison de la forte affluence. Veuillez appeler le restaurant directement au +212 6 24 66 83 76.';
+        bookingError.textContent = 'Les réservations en ligne sont clôturées après 20h en raison de la forte affluence. Veuillez appeler le restaurant directement au +212 6 14 36 66 81.';
         bookingError.hidden = false;
         return;
       }
@@ -116,7 +116,7 @@
       ].join('%0A');
 
       setTimeout(() => {
-        window.open(`https://wa.me/212667057318?text=${message}`, 'whatsapp_reservation', 'noopener,noreferrer');
+        window.open(`https://wa.me/212614366681?text=${message}`, 'whatsapp_reservation', 'noopener,noreferrer');
       }, 1500);
     });
 

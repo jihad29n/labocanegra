@@ -33,6 +33,15 @@
   --stack-gap: clamp(1.5rem, 3.5vw, 2.25rem);          /* 24px mobile -> 36px desktop */
   --footer-pad-top: clamp(2rem, 4vw, 3rem);             /* 32px mobile -> 48px desktop */
 
+  /* --- HERO FLUID SPACING --- */
+  /* Scoped to the hero so the global --space-* scale that every other section
+     consumes is left untouched. These scale continuously, so the CTA block and
+     the partner strip resize with the viewport instead of jumping at
+     breakpoints. */
+  --hero-space-s: clamp(10px, 1.2vw, 14px);   /* CTA gap, divider offset */
+  --hero-space-m: clamp(16px, 2vw, 26px);     /* CTA top margin */
+  --hero-space-l: clamp(20px, 2.5vw, 36px);   /* logo-strip top margin */
+
   --container-max: 1400px;
   --transition-fast: 0.2s ease;
   --transition-medium: 0.4s ease;
@@ -395,21 +404,27 @@ a.location__detail-value:active,
 }
 
 /* --- BRAND LOGOS ROW --- */
+/* No divider rule and no padding: the strip is separated by `margin-top` alone,
+   so there is no extra space above the marks. `flex-wrap` still lets the four
+   marks drop to a second line rather than overflow horizontally. */
 .brand-logos {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 20px;
-  margin-top: 25px;
+  gap: clamp(14px, 2.2vw, 32px);
+  margin-top: var(--hero-space-l);
   width: 100%;
-  padding: 0;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
+/* Larger square clamp than the compact 48-76px pass, so the marks read as a
+   proper partner strip again. Still a clamp, so they scale with the viewport
+   and cannot push the hero past the fold on short screens. */
 .brand-logos__item {
-  width: 130px;
-  height: 130px;
+  width: clamp(72px, 8vw, 104px);
+  height: clamp(72px, 8vw, 104px);
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid var(--color-gold);
@@ -426,11 +441,12 @@ a.location__detail-value:active,
 
 /* --- BRAND LOGOS - DESKTOP ONLY --- */
 @media (min-width: 769px) {
+  /* margin-top deliberately omitted: the base rule's --hero-space-l is the
+     single source, so desktop cannot drift taller than mobile. */
   .brand-logos {
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 60px;
     justify-content: space-between;
   }
 }
@@ -495,13 +511,27 @@ a.location__detail-value:active,
   color: var(--color-gold);
 }
 
+/* `min-width:0` keeps this flex item from refusing to shrink below its content
+   (the CTA row's intrinsic button width), which is what pushed the hero block
+   past the viewport on narrow screens. Column + flex-start lays the title,
+   tagline, CTAs and logo strip down the left edge; `display:contents` in the
+   <=768px block below hands that ordering to .hero instead. */
 .hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
   position: relative;
   z-index: 1;
-  align-self: flex-start;
-  margin-top: 155px;
+  /* Centred, not top-pinned: with height:100svh on .hero, `flex-start` left
+     every unused pixel as one lopsided void beneath the logo strip. Centring
+     splits it above and below. Desktop-only — the <=768px block dissolves this
+     wrapper (`display:contents`) and sizes .hero to its content instead. */
+  align-self: center;
   max-width: 950px;
   padding: 0 var(--space-2xl) 0 2rem;
+  /* Header clearance only; centring now supplies the vertical rhythm. */
+  margin-top: clamp(40px, 5vh, 72px);
 }
 
 
@@ -513,21 +543,53 @@ a.location__detail-value:active,
 }
 
 .hero__subtitle {
-  font-size: 0.75rem;
-  letter-spacing: 0.35em;
+  font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+  letter-spacing: 0.3em;
   text-transform: uppercase;
   margin: var(--space-sm) 0 0;
   opacity: 0;
   transform: translateY(70px);
 }
 
+/* Column of two rows: [the pair side-by-side] then [floor-plan link centred
+   under that pair]. `fit-content` shrink-wraps the block to the button pair so
+   `align-items:center` centres the link under the pair rather than across the
+   whole hero column. The row wraps on its own when the labels stop fitting. */
 .hero__actions {
   display: flex;
-  gap: var(--space-sm);
-  margin-top: 30px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--hero-space-s);
+  margin-top: var(--hero-space-m);
+  width: fit-content;
+  max-width: 100%;
   opacity: 0;
   transform: translateY(50px);
+}
+
+.hero__actions__row {
+  display: flex;
+  gap: var(--hero-space-s);
+  flex-wrap: wrap;
+}
+
+/* Hero CTAs only — scoped so the other eight .btn instances (nav, footer,
+   location, the menu-modal PDF links, the booking submit and the WhatsApp CTA)
+   keep the tuned .btn--primary/.btn--large sizing and gold/ivory palette.
+   `min-height` is a touch-target floor. The fluid padding/type stop at 480px
+   so the existing small-screen shrink in the <=480px block still wins.
+   No unguarded :hover here — all hover stays inside @media (hover:hover). */
+.hero__actions .btn {
+  box-sizing: border-box;
+  min-height: 48px;
+}
+
+@media (min-width: 481px) {
+  .hero__actions .btn {
+    padding: 14px 28px;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+  }
 }
 
 
@@ -1683,7 +1745,6 @@ a.location__detail-value:active,
   .footer__grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .hero__title { font-size: clamp(2.5rem, 7vw, 3.5rem); }
   .hero__content {   padding: 0 var(--space-xl) 0 1.5rem; }
-  .brand-logos__item { width: 80px; height: 80px; }
   .intro__grid { grid-template-columns: 1fr; }
   .intro__image { width: clamp(280px, 70vw, 350px); }
   .star-divider { justify-content: center; }
@@ -1704,10 +1765,11 @@ a.location__detail-value:active,
   .btn--large { padding: 0.85rem 2rem; }
   .hero__title { font-size: clamp(2.2rem, 8vw, 2.8rem); }
   .hero__content {   padding: 0 var(--space-md) 0 1rem; max-width: 100%; }
-  .hero__actions { flex-direction: column; }
+  /* the base rule is already a column; phones only need the full-width stack */
+  .hero__actions { width: 100%; }
+  .hero__actions__row { width: 100%; flex-direction: column; }
   .hero__actions .btn { width: 100%; }
   .brand-logos { gap: 12px; }
-  .brand-logos__item { width: 60px; height: 60px; }
   .intro__image { width: clamp(240px, 70vw, 280px); }
   .kandinsky__video { width: clamp(240px, 70vw, 280px); }
   .hero-video-container__circle { width: 220px; height: 220px; top: 90px; right: 0; }
@@ -1803,16 +1865,17 @@ a.location__detail-value:active,
     text-align: center;
   }
 
+  /* the main axis is now vertical, so `align-items` does the centring that
+     `justify-content` used to do while .hero__actions was a row */
   .hero__actions {
     order: 5;
-    justify-content: center;
+    align-items: center;
     width: 100%;
   }
 
   .brand-logos {
     order: 6;
     justify-content: center;
-    margin-top: 2rem;
   }
 
   /* video + social links: after the subtitle, before the buttons, centered */
