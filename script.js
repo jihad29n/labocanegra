@@ -9,6 +9,15 @@
   // Prevent the browser from restoring the previous scroll/anchor position on reload
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
+  /* ---- Couche luxe : hook global de la barre d'état (reservation.html) ----
+     Défini hors DOMContentLoaded : le script inline de reservation.html s'exécute
+     pendant l'analyse et l'appelle dès le premier rendu. Aucun effet ailleurs
+     (l'élément est introuvable et la fonction se contente de ne rien faire). */
+  window.updateStatusBar = ({ number, seats, status }) => {
+    const el = document.getElementById('statusTable');
+    if (el) el.innerHTML = `Table ${number} : <strong>${seats} places</strong> — ${status}`;
+  };
+
   document.addEventListener('DOMContentLoaded', () => {
     // Always land at the very top, ignoring restored/anchor position
     if (location.hash) history.replaceState(null, '', location.pathname + location.search);
@@ -36,7 +45,7 @@
     overlay?.addEventListener('click', closeModal);
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !menuModal.hidden) closeModal();
+      if (e.key === 'Escape' && menuModal && !menuModal.hidden) closeModal();
     });
 
     // Booking Modal
@@ -66,7 +75,7 @@
     bookingOverlay?.addEventListener('click', closeBookingModal);
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !bookingModal.hidden) closeBookingModal();
+      if (e.key === 'Escape' && bookingModal && !bookingModal.hidden) closeBookingModal();
     });
 
     // Booking Form Submit
@@ -134,7 +143,7 @@
     historyOverlay?.addEventListener('click', closeHistoryModal);
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !historyModal.hidden) closeHistoryModal();
+      if (e.key === 'Escape' && historyModal && !historyModal.hidden) closeHistoryModal();
     });
 
     // Contact Modal
@@ -151,7 +160,7 @@
     contactOverlay?.addEventListener('click', closeContactModal);
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !contactModal.hidden) closeContactModal();
+      if (e.key === 'Escape' && contactModal && !contactModal.hidden) closeContactModal();
     });
 
     // Dynamic Image Slider (coverflow)
@@ -228,5 +237,79 @@
       render();
       play();
     });
+
+    /* ============================================================
+       COUCHE LUXE — réservation.html
+       Chaque bloc est neutralisé dès que ses éléments sont absents :
+       script.js est partagé avec les autres pages du site.
+       ============================================================ */
+
+    // Menu burger du header
+    const burgerBtn = document.getElementById('burger');
+    const mainNav = document.getElementById('mainNav');
+    if (burgerBtn && mainNav) {
+      burgerBtn.addEventListener('click', () => {
+        const open = mainNav.classList.toggle('is-open');
+        burgerBtn.setAttribute('aria-expanded', open);
+      });
+    }
+
+    // État actif de la navbar (partagé index.html + reservation.html)
+    const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    document.querySelectorAll('.main-nav__list a.nav-link').forEach((link) => {
+      const href = (link.getAttribute('href') || '').split(/[?#]/)[0].split('/').pop().toLowerCase();
+      link.classList.toggle('nav-link--active', href === here);
+    });
+    const navReserve = document.getElementById('navReserve');
+    if (navReserve) {
+      navReserve.classList.toggle('is-active', here === 'reservation.html');
+      navReserve.addEventListener('click', () => {
+        const target = document.querySelector('.floor');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+
+    // Date / heure vivantes dans la barre d'état (rafraîchi toutes les 30 s)
+    const statusDate = document.getElementById('statusDate');
+    const statusTime = document.getElementById('statusTime');
+    if (statusDate && statusTime) {
+      const pageLang = document.documentElement.lang || 'fr';
+      /* Le plan et les créneaux sont calés sur Tanger (GMT+1, voir TZ dans
+         reservation.html) : l'horloge de la barre doit donner la MÊME heure,
+         pas celle du fuseau du visiteur. Sans TZ (autre page), repli local. */
+      const tz = (typeof TZ !== 'undefined') ? { timeZone: TZ } : {};
+      const tick = () => {
+        const now = new Date();
+        statusDate.textContent = new Intl.DateTimeFormat(
+          pageLang, Object.assign({ weekday: 'long', day: 'numeric', month: 'long' }, tz)
+        ).format(now);
+        statusTime.textContent = new Intl.DateTimeFormat(
+          pageLang, Object.assign({ hour: '2-digit', minute: '2-digit' }, tz)
+        ).format(now);
+      };
+      tick();
+      setInterval(tick, 30000);
+    }
+
+    // Mise à l'échelle du plan (ResizeObserver) — le dessin reste en
+    // coordonnées 500×340 : seule l'échelle change, jamais le positionnement
+    // des tables (translate(-50%,-50%) posé par reservation.html).
+    const floor = document.querySelector('.floor');
+    const floorStage = document.querySelector('.floor-stage');
+    if (floor && floorStage) {
+      const BASE_W = 500, BASE_H = 340;
+      // Équivalent exact de l'ancien MAXSAGE=1.6 appliqué au cadre 411,765×280
+      const CAP = 1.6 * 280 / 340;
+      const fit = () => {
+        const w = floor.clientWidth;
+        if (!w) return;
+        const s = Math.min(w / BASE_W, CAP);
+        floorStage.style.transform = `scale(${s})`;
+        floor.style.height = Math.ceil(BASE_H * s) + 4 + 'px';
+      };
+      if (window.ResizeObserver) new ResizeObserver(fit).observe(floor);
+      else addEventListener('resize', fit);
+      fit();
+    }
   });
 })();
