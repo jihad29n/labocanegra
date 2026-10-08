@@ -237,7 +237,7 @@ main.res{
    Précautions :
    • .el{transform:translate(-50%,-50%)} garde le positionnement : jamais écrasé.
    • --c ([data-s]) n'est plus qu'accessoire (legend) ; l'état vient du snippet. */
-.floor-wrap{display:flex;flex-direction:column;gap:16px}
+.floor-wrap{display:flex;flex-direction:column;gap:12px}
 
 /* ============ FLOOR STAGE ============ */
 .floor {
@@ -456,12 +456,20 @@ body.lux .floor-stage{background:transparent;position:relative;z-index:2}
 
 /* ============================ ONGLETS DE SALLE ============================ */
 .salle-tabs{
-  display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;
+  margin:0;
+  padding:0;
+  border:none;
+  border-radius:0;
+  background:transparent;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+  box-shadow:none;
 }
 .salle-tab{
   font:inherit;
-  font-size:.76rem;font-weight:500;letter-spacing:.20em;text-transform:uppercase;
-  padding:11px 22px;
+  font-size:.68rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;
+  padding:7px 16px;
   border:1px solid var(--lux-line);
   border-radius:999px;
   background:rgba(255,255,255,.03);
@@ -540,7 +548,32 @@ body.lux .floor-stage{background:transparent;position:relative;z-index:2}
 }
 @media (max-width:560px){
   .logo__text{font-size:0.9rem}
-  .salle-tab{padding:10px 16px;letter-spacing:.14em}
+  .salle-tab{padding:6px 12px;letter-spacing:.14em}
+}
+@media (max-width:900px){
+  /* La légende quitte le surplomb du plan : posée juste SOUS le cadre,
+     horizontale et centrée, sans chevaucher aucune table. */
+  #view{
+    overflow:visible!important;    /* contredit overflow:hidden inline : laisse dépasser la légende */
+    contain:none!important;        /* contredit contain:layout paint inline : même but */
+    margin-bottom:40px;            /* espace réservé entre le plan et la barre d'état */
+  }
+  .floor-legend{
+    top:100%;                      /* dossier : juste sous le bord inférieur du plan */
+    left:0; right:0; bottom:auto;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+    gap:8px 14px;
+    width:auto; max-width:100%;
+    margin:10px auto 0;
+    padding:7px 14px;
+    border-radius:999px;
+    background:rgba(10,9,8,.55);
+    box-shadow:0 4px 12px rgba(0,0,0,.35);
+  }
+  .floor-legend span{white-space:nowrap}
+  .foliage-bl{bottom:0}            /* overflow visible : le feuillage reste dans le cadre */
 }
 @media (prefers-reduced-motion:reduce){
   .lux *,.lux *::before,.lux *::after{transition:none!important;animation:none!important}
