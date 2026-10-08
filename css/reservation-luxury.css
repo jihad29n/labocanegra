@@ -556,18 +556,20 @@ body.lux .floor-stage{background:transparent;position:relative;z-index:2}
   #view{
     overflow:visible!important;    /* contredit overflow:hidden inline : laisse dépasser la légende */
     contain:none!important;        /* contredit contain:layout paint inline : même but */
-    margin-bottom:40px;            /* espace réservé entre le plan et la barre d'état */
+    margin-bottom:52px;            /* espace réservé : plan → légende → barre d'état (≥ 15-20 px d'air) */
   }
   .floor-legend{
     top:100%;                      /* dossier : juste sous le bord inférieur du plan */
     left:0; right:0; bottom:auto;
+    margin:6px auto 0;             /* marges strictement positives : aucun chevauchement */
     flex-direction:row;
     align-items:center;
     justify-content:center;
-    gap:8px 14px;
+    gap:6px 10px;
     width:auto; max-width:100%;
-    margin:10px auto 0;
-    padding:7px 14px;
+    padding:6px 12px;
+    font-size:.68rem;
+    letter-spacing:.08em;
     border-radius:999px;
     background:rgba(10,9,8,.55);
     box-shadow:0 4px 12px rgba(0,0,0,.35);
