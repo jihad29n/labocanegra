@@ -28,7 +28,7 @@ html,body{margin:0;background:var(--bg);color:var(--fg);font:14px system-ui,sans
 .dk{background:var(--dark);opacity:.8}
 .plant{width:26px;height:20px;border-radius:50%;background:radial-gradient(circle,#e3b83a 30%,#4a6a1a 31%);box-shadow:0 6px 0 -2px #bbb}
 .palm{width:46px;height:36px;border-radius:50%;background:radial-gradient(circle,#2f5a3a,#1c3a28);opacity:.8}
-.pool{background:#1736d8;border:2px solid var(--busy);box-shadow:inset 0 0 8px #6af}
+.pool{background:#1736d8;border:2px solid #d4683f;box-shadow:inset 0 0 8px #6af}
 .tbl{display:grid;place-items:center;cursor:pointer;padding:0}
 .tbl[data-s=free]{--c:var(--free)}
 .tbl[data-s=soon]{--c:var(--free)}
@@ -143,9 +143,9 @@ dialog .sep{border:0;border-top:1px solid #333;margin:2px 0;width:100%}
       <div class="floor-bg-texture" aria-hidden="true"></div>
       <div class="foliage-bl" aria-hidden="true"></div>
       <div class="legend floor-legend" aria-label="Légende">
-        <span><i style="background:var(--free)"></i>Libre</span>
-        <span><i style="background:var(--busy)"></i>Réservée</span>
-        <span><i style="background:var(--free);box-shadow:inset 0 0 0 2px #fff6"></i>Réservation à venir</span>
+        <span><i style="background:var(--free);box-shadow:0 0 8px 2px rgba(46,204,113,.55)"></i>Libre</span>
+        <span><i style="background:var(--busy);box-shadow:0 0 8px 2px rgba(231,76,60,.55)"></i>Réservée</span>
+        <span><i style="background:var(--soon);box-shadow:0 0 8px 2px rgba(243,156,18,.55)"></i>Réservation à venir</span>
       </div>
       <div id="stage" class="floor-stage"></div>
     </div>

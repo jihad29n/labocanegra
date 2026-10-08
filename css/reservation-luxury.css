@@ -31,12 +31,12 @@
   --transition-fast:0.2s ease;
   --transition-medium:0.4s ease;
 
-  /* États du plan : or (disponible) et terre cuite (occupée) — plus de vert.
-     Le balisage en ligne de reservation.html lit var(--free) / var(--busy)
-     (legend) : ces deux variables sont la source des accents. Alignées sur le
-     snippet (.floor : tableau libre or, réservé #d4683f). */
-  --free:#c9a86a;
-  --busy:#d4683f;
+  /* États du plan : libre = vert, à venir = ambre, réservée = rouge.
+     La pastille « LED » des tables (::after) et la légende s'alignent ici.
+     Le bois des tables reste neutre en toute circonstance. */
+  --free:#2ecc71;
+  --busy:#e74c3c;
+  --soon:#f39c12;
 }
 
 /* ---------- Fond de page (ne touche pas aux autres pages) ---------- */
@@ -339,12 +339,21 @@ body.lux .floor-stage{background:transparent;position:relative;z-index:2}
 /* if your current number sits in a dark badge, neutralise it (our badge = .n) */
 .floor .tbl :where(.label, .num, .number, .n) { background: none; border: 0; box-shadow: none; color: inherit; }
 
-/* tiny candle on every table */
+/* LED de statut : le bois reste neutre, seule la pastille intérieure change.
+   Libre = vert, Réservation à venir = ambre, Réservée = rouge. */
 .floor .tbl::after {
   content: ""; position: absolute; top: 11%; left: 50%; translate: -50% 0;
-  width: 6px; height: 6px; border-radius: 50%; pointer-events: none;
-  background: #ffe6a8;
-  box-shadow: 0 0 6px 2px rgba(255,200,110,.9), 0 0 18px 7px rgba(255,160,50,.4);
+  width: 7px; height: 7px; border-radius: 50%; pointer-events: none;
+  background: #2ecc71;
+  box-shadow: 0 0 6px 2px rgba(46,204,113,.85), 0 0 16px 6px rgba(46,204,113,.4);
+}
+.floor .tbl[data-s="soon"]::after, .floor .tbl.is-upcoming::after, .floor .tbl[data-status="upcoming"]::after {
+  background: #f39c12;
+  box-shadow: 0 0 6px 2px rgba(243,156,18,.85), 0 0 16px 6px rgba(243,156,18,.4);
+}
+.floor .tbl[data-s="busy"]::after, .floor .tbl.is-reserved::after, .floor .tbl[data-status="reserved"]::after {
+  background: #e74c3c;
+  box-shadow: 0 0 6px 2px rgba(231,76,60,.85), 0 0 16px 6px rgba(231,76,60,.4);
 }
 
 /* our script also emits real <i class="seat"> children: the pseudo-chairs below
@@ -392,17 +401,9 @@ body.lux .floor-stage{background:transparent;position:relative;z-index:2}
   box-shadow: inset 0 0 0 3px rgba(0,0,0,.25), 0 12px 22px rgba(0,0,0,.8), 0 0 22px rgba(232,170,80,.5);
 }
 .floor .tbl.is-reserved, .floor .tbl[data-status="reserved"], .floor .tbl[data-s="busy"] {
-  --chair: #7a4a35; --chair-dark: #3f2218;
-  border-color: #d4683f; cursor: not-allowed;
-  background:
-    radial-gradient(circle at 34% 26%, rgba(255,150,100,.25), transparent 55%),
-    linear-gradient(145deg, #8c3a22, #461a0f);
-  box-shadow: inset 0 0 0 3px rgba(0,0,0,.3), 0 10px 18px rgba(0,0,0,.75), 0 0 16px rgba(212,104,63,.4);
+  cursor: not-allowed;   /* le bois reste intact : seul le point indique l'état */
 }
 .floor .tbl.is-reserved:hover, .floor .tbl[data-status="reserved"]:hover, .floor .tbl[data-s="busy"]:hover { scale: var(--fit); z-index: auto; }
-.floor .tbl.is-upcoming, .floor .tbl[data-status="upcoming"], .floor .tbl[data-s="soon"] {
-  outline: 1px dashed #e8cc8f; outline-offset: 5px;
-}
 .floor .tbl.is-selected, .floor .tbl[data-selected="true"] {
   border-color: #f4dfa6;
   animation: tbl-in .6s ease both, tbl-pulse 2.4s ease-in-out .6s infinite;
