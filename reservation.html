@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LA BOCA NEGRA – Réservation</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#14161a;--fg:#eee;--red:#ff4d3d;--brick:#a8654a;--dark:#4b4a52;--tab:#e8d92b}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:14px system-ui,sans-serif}
+
+/* navbar + .res-head : entièrement gérés par css/reservation-luxury.css */
+h1{font-size:16px;margin:0;letter-spacing:.12em}
+.legend span{margin-right:12px;white-space:nowrap}.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* ===== zone plan : flex, centré et borné =====
+   #stage garde ses 500×340 logiques ; seule l'apparence est réduite par
+   l'échelle posée par script.js (scale sur .floor-stage, hauteur calculée
+   sur .floor). align-items:flex-start = le sommet du plan reste à y=0.
+   Fond, bordure et texture du sol : entièrement définis par
+   css/reservation-luxury.css (plus aucun fond vert de repli ici).        */
+#view{position:relative;display:flex;justify-content:center;align-items:flex-start;
+      overflow:hidden;contain:layout paint}
+#stage{position:relative;flex:none;width:500px;height:340px;transform-origin:50% 0;transform:scale(.823529)}
+
+/* éléments — left/top = centre, modifiables dans DATA.
+   Apparence des tables/ sièges : css/reservation-luxury.css (bois + or).   */
+.el{position:absolute;transform:translate(-50%,-50%)}
+.wall{border-radius:2px}.br{background:repeating-linear-gradient(90deg,#0003 0 1px,transparent 1px 9px),var(--brick);border:1px solid #6b3a28}
+.dk{background:var(--dark);opacity:.8}
+.plant{width:26px;height:20px;border-radius:50%;background:radial-gradient(circle,#e3b83a 30%,#4a6a1a 31%);box-shadow:0 6px 0 -2px #bbb}
+.palm{width:46px;height:36px;border-radius:50%;background:radial-gradient(circle,#2f5a3a,#1c3a28);opacity:.8}
+.pool{background:#1736d8;border:2px solid var(--busy);box-shadow:inset 0 0 8px #6af}
+.tbl{display:grid;place-items:center;cursor:pointer;padding:0}
+.tbl[data-s=free]{--c:var(--free)}
+.tbl[data-s=soon]{--c:var(--free)}
+.tbl[data-s=busy]{--c:var(--busy)}
+.tbl .n{position:relative;z-index:2}
+.seat{position:absolute;width:8px;height:8px;left:50%;top:50%;margin:-4px}
+.sq{width:38px;height:32px}.rv{width:40px;height:62px}.rl{width:84px;height:38px}.rd{width:56px;height:56px}
+
+/* ===== fenêtre de réservation (hors du plan : jamais dans le plan réduit) ===== */
+dialog{width:min(94vw,470px);max-height:92vh;overflow:auto;border:0;border-radius:12px;padding:0;
+       background:#1c1f25;color:var(--fg);box-shadow:0 20px 60px #000c}
+dialog::backdrop{background:#000b}
+dialog form{padding:16px;display:flex;flex-direction:column;gap:10px;margin:0}
+dialog h2{margin:0;font-size:17px;padding-right:26px}
+dialog .sub{margin:0;color:#aeb6bf;font-size:13px}
+dialog .sum{margin:0;padding:8px 10px;border-radius:6px;background:#12151a;border:1px solid #333;font-size:13px}
+dialog .field{display:flex;flex-direction:column;gap:4px}
+dialog .field>span,dialog label{font-size:12px;color:#aeb6bf}
+dialog input,dialog select{font:inherit;padding:9px 10px;border-radius:6px;border:1px solid #3a3f48;background:#12151a;color:#eee;width:100%}
+dialog input:focus,dialog select:focus{outline:2px solid var(--tab);outline-offset:1px;border-color:transparent}
+dialog input[aria-invalid=true],dialog select[aria-invalid=true]{border-color:#ff6b5e}
+dialog .x{position:absolute;top:10px;right:10px;width:30px;height:30px;padding:0;border:0;border-radius:6px;background:#252a31;color:#cfd4da;font-size:20px;line-height:1;cursor:pointer}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:6px}
+.slot{font:inherit;font-weight:700;font-size:12px;padding:7px 2px;border-radius:6px;border:1px solid #3a3f48;background:#252a31;color:#cfd4da;cursor:pointer}
+.slot:disabled{opacity:.3;cursor:not-allowed;text-decoration:line-through}
+.slot.on{background:var(--tab);color:#222;border-color:#fff8}
+.err{margin:0;color:#ff8a80;font-size:12px}
+.err:empty{display:none}
+.mrow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.mrow button{font:inherit;font-weight:700;border-radius:6px;padding:10px 14px;cursor:pointer;border:1px solid #0006}
+.mrow button[disabled]{opacity:.5;cursor:progress}
+.mrow .go{background:var(--tab);color:#222}
+.mrow .ghost{background:#252a31;color:#cfd4da}
+.mrow .warn{background:var(--red);color:#fff}
+.hintline{margin:0;color:#8b929b;font-size:12px}
+/* Clé anonyme absente : l'état doit se lire AVANT le clic. S'il n'apparaît
+   qu'au moment d'appuyer sur Confirmer, la panne se confond avec « le bouton
+   ne répond pas ». */
+.cfg{margin:0;padding:8px 10px;border-radius:6px;background:#3a1d1d;border:1px solid #7a2b2b;color:#ff9a95;font-size:12px;line-height:1.45}
+.cfg[hidden]{display:none}
+#cfghint{width:85%;max-width:1100px;margin:4px auto 0;padding:8px 16px}
+/* lien WhatsApp : même gabarit que les boutons de .mrow, mais une vraie
+   balise <a href> — seule façon d'ouvrir une fenêtre sans bloquer de pop-up. */
+.mrow a.go{display:inline-block;font:inherit;font-weight:700;border-radius:6px;padding:10px 14px;cursor:pointer;border:1px solid #0006;background:var(--tab);color:#222;text-decoration:none;text-align:center}
+.mrow a.go[hidden]{display:none}
+dialog .sep{border:0;border-top:1px solid #333;margin:2px 0;width:100%}
+</style>
+<!-- Fonts de la couche luxe + sa feuille de style. Placés APRÈS le <style>
+     ci-dessus : à spécificité égale, c'est la dernière feuille qui gagne. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/reservation-luxury.css">
+<!-- supabase-js (build UMD : expose un global « supabase »), puis notre configuration
+     et notre couche de données. Scripts classiques, donc bloquants : ils sont chargés
+     avant le script principal en bas de page. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<script src="supabase.js"></script>
+</head><body class="lux">
+<header class="site-header" id="site-header">
+  <div class="nav-container">
+
+    <a href="index.html" class="logo" aria-label="LA BOCA NEGRA — Accueil">
+      <span class="logo__text">LA BOCA NEGRA</span>
+    </a>
+
+    <nav class="main-nav" id="mainNav" aria-label="Navigation principale">
+      <ul class="main-nav__list">
+        <li class="main-nav__item"><a href="index.html" class="nav-link" data-i18n="nav.home">ACCUEIL</a></li>
+        <li class="main-nav__item"><a href="index.html" class="nav-link" data-i18n="nav.menu">LA CARTE</a></li>
+        <li class="main-nav__item"><a href="index.html" class="nav-link" data-i18n="nav.about">L'HISTOIRE</a></li>
+        <li class="main-nav__item"><a href="index.html" class="nav-link" data-i18n="nav.contact">CONTACT</a></li>
+      </ul>
+    </nav>
+
+    <div class="nav-actions">
+      <div class="lang-switcher" role="group" aria-label="Sélection de langue">
+        <button class="lang-btn active" data-lang="fr" aria-label="Français">FR</button>
+        <span class="lang-switcher__sep" aria-hidden="true">|</span>
+        <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+        <span class="lang-switcher__sep" aria-hidden="true">|</span>
+        <button class="lang-btn" data-lang="it" aria-label="Italiano">IT</button>
+        <span class="lang-switcher__sep" aria-hidden="true">|</span>
+        <button class="lang-btn" data-lang="es" aria-label="Español">ES</button>
+        <span class="lang-switcher__sep" aria-hidden="true">|</span>
+        <button class="lang-btn" data-lang="ar" aria-label="العربية">AR</button>
+      </div>
+      <button type="button" class="btn btn--primary nav-cta is-active" id="navReserve" data-i18n="nav.reserve" aria-current="page">RÉSERVER</button>
+      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span></button>
+    </div>
+
+  </div>
+</header>
+
+<p class="cfg" id="cfghint" hidden>Mode démonstration : la clé anonyme Supabase n'est pas encore configurée (fichier <b>supabase-config.js</b>). Le plan s'affiche, mais aucune réservation ne sera enregistrée tant que la clé n'est pas remplacée.</p>
+
+<main class="res">
+  <header class="res-head">
+    <p class="eyebrow"><span>Plan du restaurant</span></p>
+    <h1>Notre Espace</h1>
+    <p class="lede">Un cadre élégant, pensé pour votre confort</p>
+    <div class="legend"><span><i style="background:var(--free)"></i>Libre</span><span><i style="background:var(--busy)"></i>Réservée</span><span><i style="background:var(--free);box-shadow:inset 0 0 0 2px #fff6"></i>Réservation à venir</span></div>
+  </header>
+
+  <section class="floor-wrap">
+    <!-- #view = conteneur du plan (.floor.floor-container) ; #stage = le plan
+         lui-même (.floor-stage), où le script de cette page dessine les tables.
+         Fond/texture : 100 % CSS, défini par css/reservation-luxury.css. -->
+    <div class="floor floor-container" id="view">
+      <div id="stage" class="floor-stage"></div>
+    </div>
+
+    <nav class="salle-tabs" id="tabs" aria-label="Salles"></nav>
+
+    <footer class="status-bar" id="statusbar">
+      <div class="status-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M6 10v9M18 10v9M3 7h18l-1.5 3h-15z"/></svg>
+        <span><i class="dot"></i><span id="statusOpen">Réservations ouvertes</span></span>
+      </div>
+      <div class="status-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>
+        <span><span id="statusDate">—</span> <b>·</b> <span id="statusTime">—</span></span>
+      </div>
+      <div class="status-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        <span id="statusTable">Sélectionnez une table sur le plan</span>
+      </div>
+    </footer>
+  </section>
+</main>
+
+<dialog id="m" aria-labelledby="mt">
+  <form id="mf" novalidate autocomplete="on">
+    <button type="button" class="x" id="mx" aria-label="Fermer">&times;</button>
+    <h2 id="mt"></h2>
+    <p class="sub" id="msub"></p>
+
+    <div id="mbody">
+      <div id="msoon" hidden>
+        <p class="sum" id="msoontxt"></p>
+        <div class="field"><label for="mtel3">Téléphone de la réservation à annuler</label><input id="mtel3" type="tel" inputmode="tel" maxlength="20"></div>
+        <p class="err" id="msoonerr" role="alert"></p>
+        <div class="mrow"><button type="button" class="warn" id="mcan3">Annuler cette réservation</button></div>
+        <hr class="sep">
+      </div>
+      <div class="field"><label for="mdate">Date de la réservation</label>
+        <input id="mdate" type="date" required>
+        <p class="hintline" id="mdatahint"></p>
+      </div>
+      <div class="field"><span>Heure de réservation</span><div class="slots" id="mslots" role="group" aria-label="Créneaux disponibles"></div>
+        <p class="hintline" id="mclosedhint" hidden>Les réservations en ligne sont ouvertes de <b>13:00 à 20:00</b>. Chaque table est retenue 1 h 30.</p>
+      </div>
+      <p class="sum" id="msum">Choisissez un horaire.</p>
+      <div class="field"><label for="mn">Nom complet</label><input id="mn" type="text" maxlength="40" autocomplete="name"></div>
+      <div class="field"><label for="mtel">Téléphone</label><input id="mtel" type="tel" inputmode="tel" maxlength="20" autocomplete="tel"></div>
+      <div class="field"><label for="mpp">Nombre de personnes</label>
+        <select id="mpp" required>
+          <option value="" disabled selected>Choisir</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="10+">10+</option>
+        </select>
+        <p class="hintline" id="mpphint" hidden></p>
+      </div>
+      <p class="err" id="merr" role="alert"></p>
+      <p class="cfg" id="cfgerr" hidden></p>
+      <div class="mrow"><button type="button" class="ghost" id="mquit">Fermer</button><button type="submit" class="go" id="mok">Confirmer</button></div>
+    </div>
+
+    <div id="minfo" hidden>
+      <p class="sum" id="minfotext"></p>
+      <p class="hintline">Le nom du client n'est pas affiché sur le plan.</p>
+      <div class="field"><label for="mtel2">Téléphone utilisé à la réservation</label><input id="mtel2" type="tel" inputmode="tel" maxlength="20"></div>
+      <p class="err" id="minfoerr" role="alert"></p>
+      <div class="mrow"><a class="go" id="waconf" href="#" target="_blank" rel="noopener noreferrer" hidden>Envoyer sur WhatsApp</a><button type="button" class="ghost" id="mquit2">Fermer</button><button type="button" class="warn" id="mcan">Annuler ma réservation</button></div>
+    </div>
+  </form>
+</dialog>
+
+<!-- script.js : interactions du site + couche luxe (menu burger, horloge de
+     la barre d'état, mise à l'échelle du plan). Chargé AVANT le script de
+     cette page pour que window.updateStatusBar existe dès le premier rendu. -->
+<script src="script.js"></script>
+<script src="i18n.js"></script>
+<script>
+/* ===== DATA : modifier ici (x,y = centre, en px dans un plan 500×340) =====
+  AUCUNE table n'est marquée occupée : les 41 tables partent toutes LIBRES (or).
+  tables : [numéro, type(sq|rd|rv|rl), x, y]
+ murs   : [classe(br|dk), x, y, largeur, hauteur]
+ plantes: [x,y]   palmiers: [x,y]   bassins: [x,y,l,h] */
+const ROOMS = [
+{ name:'Salle 1',
+  tables:[[1,'rd',270,46],[2,'sq',330,38],[3,'sq',395,40],
+   [4,'sq',202,63],[5,'rd',55,105],[6,'sq',330,100],[7,'sq',395,100],
+   [8,'rv',150,140],[9,'sq',238,153],[10,'sq',330,162],[11,'sq',395,168],
+   [12,'rd',55,180],[13,'rv',150,220],[14,'sq',452,209],
+   [15,'rd',55,255],[16,'sq',238,230],[17,'sq',330,242],[18,'sq',395,243]],
+  walls:[['dk',170,42,16,55],['dk',70,63,100,12],['dk',270,160,14,46],['br',348,207,155,12],['br',152,283,65,12],['br',45,326,85,12],['dk',100,303,12,34]],
+  plants:[[331,67],[444,165],[457,248],[253,272]], pools:[] },
+{ name:'Salle 2',
+  tables:[[19,'sq',161,55],[20,'sq',150,105],[21,'rl',158,215],[22,'sq',252,49],
+   [23,'rd',242,149],[24,'sq',288,223],[25,'sq',345,47],[26,'sq',341,121],
+   [27,'sq',385,222],[28,'sq',441,42],[29,'sq',441,100],[30,'sq',440,155]],
+  walls:[['dk',115,80,14,52],['dk',70,52,60,12],['dk',78,215,14,46],['dk',242,215,14,46],['br',417,215,12,40],['dk',470,190,30,10]],
+  plants:[[250,85],[343,87],[363,171],[288,190],[73,270]], pools:[] },
+{ name:'Salle 3',
+  tables:[[31,'sq',166,177],[32,'sq',163,259],[33,'rd',222,108],[34,'sq',293,181],
+   [35,'sq',296,260],[36,'sq',407,105],[37,'sq',415,188],[38,'sq',403,263]],
+  walls:[['br',466,155,14,230],['dk',118,190,10,180]],
+  plants:[[356,112],[353,182]], palm:[155,108],
+  pools:[[55,98,92,14],[55,122,92,14],[55,146,92,14],[55,170,92,14],[55,194,92,14],[55,218,92,14],[55,242,92,14],[55,266,92,14]] },
+{ name:'Salle 4',
+  tables:[[39,'sq',47,133],[40,'sq',170,136],[41,'sq',277,135]],
+  walls:[['dk',318,135,14,150],['br',292,208,16,32]],
+  plants:[[60,75],[112,134],[273,80]], pools:[[345,262,12,50],[372,262,12,50],[399,262,12,50],[426,262,12,50],[453,262,12,50],[480,262,12,50]] }
+];
+const SEATS={sq:[4,2],rv:[6,2],rl:[8,4],rd:[6,0]};
+
+/* ===== 1. CONFIGURATION =====
+   OUVERTURE / DERNIER : minutes depuis minuit. DERNIER = dernière HEURE DE DÉBUT,
+   une réservation faite à 20:00 est donc retenue jusqu'à 21:30.
+   Les réservations ne vivent plus dans ce navigateur : elles sont dans Supabase
+   (table bookings). Le plan n'a donc plus de clé de sauvegarde ni d'option
+   « mémoire » — l'état est partagé par tous les visiteurs, en temps réel.    */
+const OUVERTURE=13*60, DERNIER=20*60, DUREE=90, PAS=30;
+/* Réservation ouverte jusqu'à MAX_JOURS jours d'avance. Doit correspondre à
+   l'horizon de book_slot() dans supabase-schema.sql (v_horizon).             */
+const MAX_JOURS=30;
+
+/* ===== 2. TEMPS =====
+   maintenant() = minutes depuis minuit à TANGER, en GMT+1 FIXE.
+   ATTENTION : ne pas utiliser « Africa/Casablanca ». Les règles IANA modélisent le
+   Maroc en UTC+00:00 avec un « heure d'été » négatif, donc à la saison
+   Africa/Casablanca = UTC+0 et l'horloge affiche une heure de retard ; le poste,
+   lui, est bien en GMT+1. Etc/GMT-1 = UTC+01:00 en permanence, sans ce piège :
+   l'heure affichée est celle du restaurant quel que soit le fuseau du téléphone
+   du visiteur, et il n'y a rien à corriger à la main au changement d'heure.     */
+const TZ='Etc/GMT-1';
+const HORLOGE=new Intl.DateTimeFormat('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+let maintenant=()=>{const p=HORLOGE.formatToParts(new Date()),
+  h=+p.find(x=>x.type==='hour').value,m=+p.find(x=>x.type==='minute').value;return h*60+m};
+/* Repli si un navigateur très ancien ignore timeZone : heure locale du poste. */
+if(!HORLOGE.resolvedOptions().timeZone)
+  maintenant=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
+const hhmm=v=>String(Math.floor(v/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0');
+/* jour de SERVICE ('AAAA-MM-JJ'), toujours calculé à Tanger comme l'heure.
+   Jamais toISOString() : c'est de l'UTC, et entre minuit et 01:00 GMT+1 cela
+   renverrait la date de la VEILLE pour une réservation du jour.            */
+const JOUR=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'});
+const jourDe=()=>JOUR.format(new Date());
+/* ARITHMÉTIQUE SUR LES DATES : les valeurs sont des chaînes « AAAA-MM-JJ » et
+   se comparent donc entre elles directement ('2026-10-07' < '2026-10-08'), sans
+   aucun objet Date et donc sans risque de décalage de fuseau.
+   Pour +n jours on part d'un Date à minuit UTC et on ne touche qu'à UTC : ici
+   toISOString() est sûr, contrairement à lConversion de l'heure courante.   */
+const ajouterJours=(j,n)=>{const d=new Date(j+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+/* Libellé français. On vise MIDI local : à midi, aucun décalage de fuseau ne
+   peut faire glisser la date au jour voisin, quel que soit le téléphone.     */
+const jourTxt=j=>new Date(j+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+const dureeTxt=d=>d>=60?(d%60?d+' h '+String(d%60).padStart(2,'0'):d/60+' h'):d+' min';
+const creneaux=()=>{const a=[];for(let m=OUVERTURE;m<=DERNIER;m+=PAS)a.push(m);return a};
+const ouvertA=k=>k>=OUVERTURE&&k<=DERNIER;
+/* ===== 2b. DEUX ÉTATS INDÉPENDANTS =====
+   L'ouverture du RESTAURANT (opérations physiques) et la fenêtre de
+   RÉSERVATION EN LIGNE (13:00–20:00, identique chaque jour) sont distinctes :
+   après 20:00 on ne réserve plus, mais le restaurant peut rester ouvert.
+   Horaires d'ouverture : dim–jeu ferme à minuit ; ven–sam ferme à 01:00.
+   Une fin après minuit appartient au jour de service de la VEILLE : à 00:30 un
+   samedi, c'est encore le service du vendredi (ouvert jusqu'à 01:00).          */
+const fermeTard=d=>d===5||d===6;                 /* 5=ven, 6=sam (getUTCDay) */
+const jourSemaineTanger=()=>new Date(jourDe()+'T12:00:00Z').getUTCDay();
+/* k = minutes depuis minuit (0..1439), d = jour de la semaine à Tanger. */
+const restoOuvert=(k,d)=>k>=OUVERTURE||(fermeTard((d+6)%7)&&k<60);
+/* Réservations en ligne pour le jour AFFICHÉ : fermées seulement s'il s'agit
+   d'aujourd'hui et que le dernier créneau (20:00) est passé.                   */
+const resaOuvertesAujourdhui=()=>maintenant()>=OUVERTURE&&maintenant()<=DERNIER;
+const resaFermees=j=>j===jourDe()&&!resaOuvertesAujourdhui();
+const telPropre=s=>s.replace(/\D/g,'');
+
+/* ===== 3. RÉSERVATIONS — seule source de vérité : Supabase =====
+   RESA est un simple MIROIR en mémoire des réservations du JOUR AFFICHÉ
+   (jourVue), que le client choisit avec le sélecteur de date. Tant qu'il est
+   vide (chargement en cours) `pret` reste false et le bouton Confirmer refuse
+   d'enregistrer : on ne réserve jamais une table qui est en réalité déjà prise
+   mais encore peinte en vert.                                                  */
+let RESA=[],jourCanal='',jourVue='',pret=false,panne=false,generation=0;
+/* Heure de référence pour l'état d'une table, RELATIVE AU JOUR AFFICHÉ.
+   Pour la journée en cours c'est l'heure réelle. Pour un jour à venir c'est -1 :
+   rien n'a encore commencé, donc TOUTES les réservations de ce jour sont
+   « à venir ». Sans cette distinction, une réservation de DEMAIN à 14:00 serait
+   réputée « déjà commencée » dès qu'il est 14:30 aujourd'hui : la table
+   s'afficherait libre sur le plan et sa réservation deviendrait impossible à
+   annuler depuis le plan.                                                      */
+const minuteJour=()=>(jourVue&&jourVue!==jourDe())?-1:maintenant();
+async function voirJour(j){
+  /* Passer à un autre jour invalide le miroir : on ne doit plus proposer les
+     créneaux de la journée précédente tant que la nouvelle n'est pas chargée.
+     (Une seule variable suit le jour affiché, `jourVue` : c'est elle qui sert
+     de référence, ce qui évite d'avoir deux états à garder synchronisés.)     */
+  const nouveauJour=j!==jourVue;
+  jourVue=j;
+   if(typeof SUP==='undefined'||!SUP.ok){pret=false;panne=true;return rafraichir(true)}
+  /* On écoute LE BON JOUR : le canal Realtime suit la date affichée, et après
+     minuit il se rouvre tout seul sur la nouvelle date.                       */
+  if(j!==jourCanal){SUP.jette();abonner(j)}
+  if(nouveauJour)pret=false;
+  /* Chaque rechargement porte un numéro. Deux changements de date rapides
+     produisent deux réponses ; si la plus lente arrive APRÈS la plus rapide
+     elle écraserait le miroir avec le mauvais jour. On ignore donc toute
+     réponse qui n'est plus la plus récente.                                    */
+  const m=++generation;
+  try{
+    const r=await SUP.charge(j);
+    if(m!==generation)return;
+    RESA=r;pret=true;panne=false;
+  }catch(e){
+    if(m!==generation)return;
+    /* Le plan garde ses couleurs (mieux vaut une information datée qu'un plan
+       qui vire au vert), mais on refuse d'enregistrer : les créneaux affichés
+       ne sont plus garantis.                                                   */
+    if(nouveauJour)RESA=[];
+    pret=false;panne=true;
+    console.error('[LA BOCA] Supabase injoignable',e);
+  }
+  rafraichir(true);
+}
+/* une seule connexion Realtime à la fois : toute écriture (n'importe quel
+   visiteur) redessine le plan chez tout le monde. */
+function abonner(j){jourCanal=j;SUP.souscrire(j,()=>voirJour(jourVue))}
+function connecter(){
+  abonner(jourVue||jourDe());
+  /* Filet de sécurité : si le WebSocket est coupé (proxy, Wi-Fi, téléphone en
+     veille) le plan se resynchronise quand même — et c'est aussi ce qui fait
+     basculer le jour à minuit. On recharge le jour AFFICHÉ : une rafale de
+     polling ne doit pas ramener le client sur la date du jour qu'il a choisie. */
+  setInterval(()=>voirJour(jourVue),SUP.secours);
+}
+function elaguer(){const k=minuteJour();RESA=RESA.filter(b=>b.fin>=k);}
+
+/* ===== 4. ÉTAT DÉRIVÉ — jamais stocké sur la table =====
+   Une réservation expire donc automatiquement, même si l'onglet a été fermé. */
+const resaDe=n=>RESA.filter(b=>b.table===n);
+/* active   : la table est TENUE, la plage [debut,fin) est en cours        -> busy
+   prochaine: une réservation existe mais n'a pas encore commencé        -> soon
+   Sans cette distinction, une réservation future verrouillerait la table
+   (et la rendrait incancellable) dès l'instant où elle est créée.        */
+const activeDe=n=>{const k=minuteJour();return resaDe(n).find(b=>k>=b.debut&&k<b.fin)};
+const prochaineDe=n=>{const k=minuteJour();return resaDe(n).filter(b=>b.debut>k).sort((a,b)=>a.debut-b.debut)[0]};
+const conflit=(n,d)=>{const f=d+DUREE;return resaDe(n).some(b=>d<b.fin&&b.debut<f)};
+/* aucune table n'est « occupée » en dur : le plan démarre intégralement LIBRE */
+{let k=0;ROOMS.forEach(r=>r.tables.forEach(t=>{t[0]=++k}))}
+const TYPES=new Map();ROOMS.forEach(r=>r.tables.forEach(t=>TYPES.set(t[0],t[1])));
+const places=n=>SEATS[TYPES.get(n)][0];
+/* effectif demandé : 'pers' = nombre (10 pour « 10+ »), 'plus' = le « + » */
+const txtPers=b=>{if(!b||!b.pers)return'';return b.plus?'10+ personnes':b.pers+(b.pers>1?' personnes':' personne')};
+const choixPers=()=>$('mpp').value.replace('+','');   /* '10+' -> 10, '' -> '' */
+const tropDePers=n=>!!n&&+choixPers()>places(n);     /* la table est trop petite */
+function etat(n){return activeDe(n)?'busy':(prochaineDe(n)?'soon':'free')}
+
+/* ===== 5. MISE À L'ÉCHELLE DU PLAN =====
+   Déléguée à script.js : il observe .floor et pose un scale sur
+   .floor-stage (base 500×340, coupe à l'ancien MAXSAGE). Ici on ne garde
+   que la référence au conteneur de dessin, utilisé par draw().           */
+const stage=document.getElementById('stage');
+
+/* ===== 6. RENDU DU PLAN ===== */
+let cur=0, focus=0;
+const el=(c,x,y,w,h,p={})=>{const d=document.createElement('div');d.className='el '+c;d.style.left=x+'px';d.style.top=y+'px';if(w)d.style.width=w+'px';if(h)d.style.height=h+'px';Object.assign(d.dataset,p);return d};
+function draw(){
+  const r=ROOMS[cur];stage.innerHTML='';
+  r.walls.forEach(([c,x,y,w,h])=>stage.append(el('wall '+c,x,y,w,h)));
+  r.pools.forEach(([x,y,w,h])=>stage.append(el('pool',x,y,w,h)));
+  if(r.palm)stage.append(el('palm',...r.palm));
+  r.plants.forEach(([x,y])=>stage.append(el('plant',x,y)));
+  r.tables.forEach(t=>{const [n,type,x,y]=t;
+    const s=etat(n);
+    const b=el('tbl '+type,x,y,0,0,{s});b.style.width=b.style.height='';
+    b.innerHTML='<span class="n">'+n+'</span>';
+    const [cnt,cols]=SEATS[type];
+    for(let i=0;i<cnt;i++){const d=document.createElement('i');d.className='seat';
+      if(type==='rd'){const a=i/cnt*6.283;d.style.transform=`translate(${Math.cos(a)*24}px,${Math.sin(a)*24}px)`}
+      else{const w={sq:38,rv:40,rl:84}[type],h={sq:32,rv:62,rl:38}[type],rows=Math.ceil(cnt/cols);
+        const c=i%cols,rw=Math.floor(i/cols);
+        d.style.transform=`translate(${(c+.5)/cols*w-w/2}px,${(rw+.5)/rows*h-h/2}px)`}
+      b.append(d)}
+    if(s==='soon')b.title='Prochaine réservation à '+hhmm(prochaineDe(n).debut)+' — touchez pour réserver';
+    if(s==='busy')b.title='Réservée jusqu\'à '+hhmm(activeDe(n).fin);
+    if(s==='free')b.title='Table libre — touchez pour réserver';
+    b.onclick=()=>{focus=n;ouvrir(n)};
+    stage.append(b)});
+}
+
+/* ===== 7. BARRE D'ÉTAT CLIENT =====
+   La barre d'état luxe compte trois champs fixes : #statusOpen (ouvert ou
+   fermé), #statusDate/#statusTime (horloge tenue par script.js) et
+   #statusTable (table sélectionnée, via window.updateStatusBar). Le texte
+   reste mot pour mot celui de l'ancien panneau.                             */
+function panel(){
+  /* DEUX ÉTATS DISTINCTS : le badge reflète l'ouverture du restaurant (horaires
+     réels, indépendants du jour affiché) ; la fermeture des réservations en
+     ligne est signalée séparément (pastille ambre + message).                 */
+  const open=restoOuvert(maintenant(),jourSemaineTanger());
+  const resa=resaFermees(jourVue||jourDe());
+  /* Le jour affiché est rappelé EN TÊTE du message, et non à sa place : sinon
+     la ligne sur la table sélectionnée effacerait l'indication de la date.    */
+  const contexte=(jourVue&&jourVue!==jourDe())?'Plan du '+jourTxt(jourVue)+' — ':'';
+  const ouvert=document.getElementById('statusOpen');
+  if(ouvert)ouvert.textContent=open?'Restaurant ouvert':'Restaurant fermé';
+  const barre=document.getElementById('statusbar');
+  if(barre){
+    barre.classList.toggle('is-closed',!open);
+    barre.classList.toggle('is-bookings-closed',open&&resa);
+  }
+  const status=document.getElementById('statusTable');
+  /* Pas de table sélectionnée : on affiche le message par défaut, avec le
+     rappel du jour affiché en tête.                                           */
+  if(!focus){
+    if(status)status.textContent=contexte+(resa
+      ? 'Réservations en ligne fermées pour aujourd\'hui — choisissez une date à venir'
+      : 'Touchez une table verte pour réserver');
+    return;
+  }
+  const s=etat(focus),etatTxt = s==='busy' ? 'réservée jusqu\'à '+hhmm(activeDe(focus).fin)
+      : s==='soon' ? 'prochaine réservation à '+hhmm(prochaineDe(focus).debut)+' (réservable sur un autre créneau)'
+      : 'libre';
+  const jourCtx=(jourVue&&jourVue!==jourDe())?'Plan du '+jourTxt(jourVue)+' · ':'';
+  /* updateStatusBar est défini par script.js. Avant son chargement (ou sur
+     une page qui ne l'inclut pas), on retombe sur une écriture directe.     */
+  if(typeof window.updateStatusBar==='function')
+    window.updateStatusBar({number:focus,seats:places(focus),status:jourCtx+etatTxt});
+  else if(status)status.textContent='Table '+focus+' : '+places(focus)+' places — '+jourCtx+etatTxt;
+}
+
+/* ===== 8. FENÊTRE DE RÉSERVATION ===== */
+const m=document.getElementById('m');
+const $=id=>document.getElementById(id);
+let slotChoisi=null;
+function mode(x){m.dataset.mode=x;
+  $('mbody').hidden=x!=='book';$('minfo').hidden=x!=='info';}
+/* ===== Pourquoi Confirmer est inactif =====
+   Trois causes très différentes partagent le même symptôme visuel (« le bouton
+   ne fait rien ») : la clé manque, la base ne répond pas, ou la charge est en
+   cours. On les nomme — sinon l'utilisateur croit à un bug du formulaire.   */
+function raison(){
+  if(typeof SUP==='undefined')return 'Module de réservation non chargé (fichier supabase.js). Rechargez la page, puis appelez le restaurant.';
+  if(!SUP.ok)return 'Clé anonyme Supabase non configurée (fichier supabase-config.js) : le service de réservation est inactif. Appelez le restaurant.';
+  if(panne)return 'Le service de réservation est indisponible. Merci d\'appeler le restaurant.';
+  return 'Les réservations se chargent, merci de patienter un instant.';
+}
+/* La clé ne peut pas être corrigée à la volée (il faut recharger la page) :
+   on l'annonce en haut de page ET dans la fenêtre, et on désactive vraiment
+   le bouton, au lieu d'un clic sans effet.                                    */
+function annonceConfig(){
+  /* SUP absent = le fichier supabase.js n'a jamais été exécuté (script mal placé,
+     404, réseau...). On ne touche pas à SUP.ok : on nomme la cause, on désactive. */
+  const absent=typeof SUP==='undefined';
+  const bon=!absent&&!!SUP.ok;
+  $('cfghint').hidden=bon;
+  $('cfgerr').hidden=bon;
+  if(!bon){
+    $('cfgerr').textContent=raison();
+    $('mok').disabled=true;
+    $('mok').setAttribute('aria-describedby','cfgerr');
+  }
+}
+/* Le sélecteur de date est borné des deux côtés : pas de date passée, pas au-delà
+   de l'horizon du restaurant. La valeur suit toujours le jour affiché, pour que
+   le champ ne « saute » pas si le navigateur Recallé l'autre.                  */
+function majPicker(){
+  const d=$('mdate'),min=jourDe(),max=ajouterJours(min,MAX_JOURS);
+  d.min=min;d.max=max;
+  if(!jourVue)jourVue=min;
+  if(!d.value||d.value<min||d.value>max)d.value=jourVue;
+  return d.value;
+}
+/* Rappel sous le champ : la date choisie en toutes lettres. Un jour à venir
+   reste réservable même si le service d'aujourd'hui est terminé.              */
+function hintDate(){
+  const h=$('mdatahint'),v=$('mdate').value;
+  if(!v){h.textContent='';return}
+  const min=jourDe(),delta=Math.round((Date.parse(v+'T00:00:00Z')-Date.parse(min+'T00:00:00Z'))/86400000);
+  h.textContent = delta===0 ? 'Aujourd\'hui — '+jourTxt(v)
+    : delta===1 ? 'Demain — '+jourTxt(v)
+    : jourTxt(v)+(resaFermees(v)?' — réservations en ligne fermées ce jour-là.':'');
+}
+function remplirModale(n){
+  /* une réservation future n'empêche pas d'en créer une autre sur un créneau libre :
+     on affiche son créneau + un moyen de l'annuler, puis le formulaire en dessous */
+  const soon=prochaineDe(n);
+  $('msoon').hidden=!soon;
+  if(soon){$('msoontxt').innerHTML='Déjà réservée de <b>'+hhmm(soon.debut)+'</b> à <b>'+hhmm(soon.fin)+'</b>'
+    +(txtPers(soon)?' — '+txtPers(soon):'')+' — en dessous, les créneaux encore libres.';
+    $('mtel3').value='';$('msoonerr').textContent='';$('mtel3').removeAttribute('aria-invalid')}
+  hintDate();
+  peindreCreneaux(n);
+}
+function ouvrir(n){
+  focus=n;const s=etat(n);
+  /* La barre d'état doit dire tout de suite quelle table est sélectionnée :
+     rafraichir() ne la repeint que si les données ou la minute changent.  */
+  panel();
+  slotChoisi=null;$('merr').textContent='';$('minfoerr').textContent='';
+  $('mn').value='';$('mtel').value='';$('mtel2').value='';$('mtel3').value='';$('mpp').value='';
+  $('waconf').hidden=true;   /* le lien n'appartient qu'à la réservation confirmée */
+  $('mpphint').hidden=true;
+  $('msoonerr').textContent='';
+  ['mn','mtel','mtel2','mtel3'].forEach(i=>$(i).removeAttribute('aria-invalid'));
+  $('mt').textContent='Table '+n+' · '+places(n)+' places';
+  if(s==='busy'){const a=activeDe(n);
+    $('msub').textContent='Réservation en cours';
+    $('minfotext').innerHTML='Cette table est retenue de <b>'+hhmm(a.debut)+'</b> à <b>'+hhmm(a.fin)+'</b> (1 h 30)'
+      +(txtPers(a)?' — '+txtPers(a)+'.':'');
+    mode('info');if(!m.open)m.showModal();$('mtel2').focus();return}
+  /* PAS DE PANNEAU « SERVICE FERMÉ » : la fenêtre de réservation reste ouverte
+     même après la fermeture du service, parce que les jours à venir restent
+     réservables. Les horaires déjà écoulés sont simplement barrés (voir
+     peindreCreneaux). C'est ce panneau qui, avant, renvoyait le client vers le
+     téléphone au lieu de lui laisser choisir une date à venir.               */
+  majPicker();
+  $('msub').textContent=resaFermees(jourVue)?'Réservations en ligne fermées pour aujourd\'hui — choisissez une date à venir':'Réservation client';
+  mode('book');remplirModale(n);
+  if(!m.open)m.showModal();
+  const pre=$('mslots').querySelector('.slot:not(:disabled)');if(pre)pre.focus();
+}
+function peindreCreneaux(n){
+  const box=$('mslots'),k=maintenant(),j=jourVue||jourDe();
+  /* Un horaire n'est « passé » que pour la journée EN COURS. Sur une date à
+     venir, 13:00 de demain est aussi disponible que 19:00 ce soir.            */
+  const passeSeulement=j===jourDe();
+  box.innerHTML='';
+  creneaux().forEach(d=>{
+    const b=document.createElement('button');
+    b.type='button';b.textContent=hhmm(d);
+    const passe=passeSeulement&&d<k,pris=conflit(n,d);
+    b.disabled=passe||pris;
+    b.className='slot'+(d===slotChoisi?' on':'');
+    /* La couleur seule ne dit rien à un lecteur d'écran : l'état « choisi »
+       doit être annoncé comme tel. */
+    b.setAttribute('aria-pressed',d===slotChoisi?'true':'false');
+    b.title=passe?'Heure déjà passée':pris?'Table déjà retenue sur ce créneau':'Disponible';
+    if(!b.disabled)b.onclick=()=>{slotChoisi=d;peindreCreneaux(n);resume()};
+    box.append(b)});
+  /* La phrase d'origine est conservée mot pour mot, mais comme simple rappel :
+     elle n'est affichée que si elle sert à quelque chose, c'est-à-dire quand le
+     jour choisi est aujourd'hui et que le service est terminé.                */
+  $('mclosedhint').hidden=!resaFermees(j);
+  resume();
+}
+function resume(){
+  const p=txtPers({pers:+choixPers()||0,plus:$('mpp').value.endsWith('+')});
+  /* avertissement NON bloquant : on laisse le client confirmer, le restaurant
+     rappelle si le groupe ne tient pas sur la table (tableaux accolables).     */
+  const h=$('mpphint'),cap=focus?places(focus):0;
+  h.hidden=!(tropDePers(focus)&&cap);
+  if(!h.hidden)h.textContent='Cette table compte '+cap+' places maximum. Vous pouvez confirmer : le restaurant vous rappelle pour une table adaptée.';
+  $('msum').innerHTML = slotChoisi===null ? 'Choisissez un horaire.'
+    : 'Table retenue de <b>'+hhmm(slotChoisi)+'</b> à <b>'+hhmm(slotChoisi+DUREE)+'</b> ('+dureeTxt(DUREE)+')'
+      +(p?' · '+p:'')+'.';
+}
+$('mpp').addEventListener('change',resume);
+/* Changement de date : on recharge ET on réécrit le canal Realtime sur ce jour,
+   puis on repeint les créneaux de la table ouverte. Le créneau choisi ne vaut
+   plus rien : il appartenait à l'autre journée.                             */
+$('mdate').addEventListener('change',async e=>{
+  const v=e.target.value,min=jourDe(),max=ajouterJours(min,MAX_JOURS);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(v)||v<min||v>max){
+    /* On RESTAURE la dernière date valide au lieu de rendre silencieusement.
+       Un simple `return` laisserait le champ afficher « vide » pendant que
+       jourVue continue de pointer sur l'ancien jour : Confirmer partirait
+       alors sur une date que le client ne voit plus à l'écran.               */
+    e.target.value=jourVue||min;
+    hintDate();
+    e.target.setAttribute('aria-invalid','true');
+    $('merr').textContent='Choisissez une date entre aujourd\'hui et '+jourTxt(max)+'.';
+    return;
+  }
+  e.target.removeAttribute('aria-invalid');
+  $('merr').textContent='';
+  slotChoisi=null;
+  /* pendant le rechargement, la fenêtre n'est pas modale du tout : on neutralise
+     Confirmer pour ne pas réserver sur le miroir de l'autre journée.         */
+  pret=false;
+  $('msub').textContent=resaFermees(v)?'Réservations en ligne fermées pour aujourd\'hui — choisissez une autre date':'Réservation client';
+  hintDate();peindreCreneaux(focus);
+  await voirJour(v);
+  /* si le client a refermé la fenêtre pendant la requête, on ne repeint rien.
+     C'est `open` qu'il faut tester, pas `mode` : la fenêtre reste ouverte en
+     mode « réservation confirmée » (info), et le repeindre est non seulement
+     sans danger mais nécessaire — le jour vient de changer sous elle.        */
+  if(!m.open)return;
+  $('msub').textContent=resaFermees(v)?'Réservations en ligne fermées pour aujourd\'hui — choisissez une autre date':'Réservation client';
+  remplirModale(focus);
+});
+/* ===== RÉCAPITULATIF + WHATSAPP =====
+   Deux exigences d'un coup : le client doit VOIR sa réservation confirmée, et
+   pouvoir la transmettre au restaurant. On reste donc dans la fenêtre (le plan
+   derrière vient de se colorer) au lieu de la refermer sans un mot. L'envoi
+   repose sur une balise <a href> : une fenêtre ouverte après un `await` peut
+   être bloquée par le bloqueur de pop-up, un clic sur un lien ne l'est jamais.
+   WhatsApp ne s'ouvre jamais tout seul : le récapitulatif s'affiche d'abord,
+   l'envoi n'a lieu qu'au clic sur « Envoyer sur WhatsApp ».
+   Le message reprend celui de script.js, complété par la table, que seul le
+   plan de salle connaît. `nom`/`tel` sont relus ici du formulaire : ils ne
+   reviennent jamais de la base (voir versApp, confidentialité).               */
+function messageWA(r,nom,tel){
+  const date=new Intl.DateTimeFormat('fr-FR',{weekday:'long',year:'numeric',
+    month:'long',day:'numeric',timeZone:'UTC'})
+    .format(new Date(r.jour+'T00:00:00Z'));
+  return encodeURIComponent([
+    '🍽️ *Réservation — LA BOCA NEGRA*','',
+    '👤 *Nom :* '+nom,
+    '📞 *Téléphone :* '+tel,
+    '👥 *Invités :* '+r.pers,
+    '📅 *Date :* '+date,
+    '⏰ *Heure :* '+hhmm(r.debut),
+    '🪑 *Table :* '+r.table,'',
+    'Merci de confirmer cette réservation.'
+  ].join('\n'));
+}
+function confirmation(r,nom,tel){
+  const url='https://wa.me/212614366681?text='+messageWA(r,nom,tel);
+  const lien=$('waconf');
+  lien.href=url;lien.hidden=false;
+  $('mtel2').value=tel;   /* « Annuler ma réservation » reste utilisable tout de suite */
+  $('minfoerr').textContent='';
+  $('minfotext').innerHTML='Réservation confirmée — table <b>'+r.table+'</b>, le <b>'
+    +jourTxt(r.jour)+'</b>, de <b>'+hhmm(r.debut)+'</b> à <b>'+hhmm(r.fin)+'</b> · '+r.pers+' pers.';
+  mode('info');
+  if(!m.open)m.showModal();
+  $('mquit2').focus();
+  /* WhatsApp ne s'ouvre JAMAIS tout seul : le lien ci-dessus attend le clic du
+     client. Trois issues depuis ce récapitulatif : « Envoyer sur WhatsApp »,
+     « Fermer », « Annuler ma réservation ».                                    */
+}
+$('mf').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(m.dataset.mode!=='book')return;
+  const nom=$('mn').value.trim(),tel=telPropre($('mtel').value);
+  const pp=$('mpp').value,plus=pp.endsWith('+'),pers=plus?10:+pp;   /* '10+' -> 10, jamais NaN */
+  const k=maintenant(),err=x=>{$('merr').textContent=x};
+  const bad=(id,msg)=>{$(id).setAttribute('aria-invalid','true');err(msg)};
+  ['mdate','mn','mtel','mpp'].forEach(i=>$(i).removeAttribute('aria-invalid'));
+  /* État du SERVICE d'abord : la cause n'est dans aucun des champs, et le
+     bouton doit le dire lui-même — un clic sans effet se lit comme un bug.   */
+   if(typeof SUP==='undefined'||!SUP.ok)return annonceConfig();
+   if(!pret)return err(raison());
+  /* 1. DATE — le champ est la source de vérité, pas `jourVue`. Le formulaire
+     porte `novalidate`, donc `required` ne protège rien : sans cette lecture,
+     un champ vidé afficherait « » pendant que la réservation part sur le
+     dernier jour affiché.                                                    */
+  const saisie=$('mdate').value;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(saisie))return bad('mdate','Choisissez une date de réservation.');
+  if(saisie<jourDe())return bad('mdate','Choisissez une date à venir.');
+  if(saisie>ajouterJours(jourDe(),MAX_JOURS))return bad('mdate','La réservation n\'est ouverte que '+MAX_JOURS+' jours à l\'avance.');
+  if(saisie!==jourVue){
+    /* Champ et écran divergent : on recharge ce que le champ annonce, et le
+       créneau choisi devient caduc (il appartenait à l'autre journée).        */
+    slotChoisi=null;
+    await voirJour(saisie);
+    if(m.dataset.mode!=='book')return;
+    majPicker();remplirModale(focus);
+  }
+  const jv=saisie;
+  /* 2. HEURE */
+  if(slotChoisi===null)return err('Choisissez un horaire de réservation.');
+  /* 3. NOM */
+  if(nom.length<2)return bad('mn','Veuillez indiquer votre nom (2 caractères minimum).');
+  /* 4. TÉLÉPHONE */
+  if(tel.length<6)return bad('mtel','Numéro de téléphone incomplet (6 chiffres minimum).');
+  /* 5. NOMBRE DE PERSONNES */
+  if(!pp)return bad('mpp','Choisissez le nombre de personnes.');
+  /* « passé » ne concerne que la journée en cours : demain 13:00 est valide. */
+  if(jv===jourDe()&&slotChoisi<k)return err('Cet horaire est déjà passé, choisissez-en un autre.');
+  if(slotChoisi>DERNIER)return err('La dernière réservation commence à '+hhmm(DERNIER)+'.');
+  if(conflit(focus,slotChoisi)){peindreCreneaux(focus);return err('Désolé, ce créneau vient d\'être pris. Choisissez-en un autre.')}
+  /* conflit() ci-dessus n'est qu'un confort d'affichage : deux visiteurs
+     peuvent cliquer au même instant. C'est l'index unique de la base
+     (reservations_sans_chevauchement) qui tranche définitivement.           */
+  const btn=$('mok');btn.disabled=true;err('');
+  try{
+    const r=await SUP.reserver({jour:jv,table:focus,debut:slotChoisi,
+                                nom:nom,tel:tel,pers:pers,plus:plus});
+    /* Miroir local : le plan se colore même si le temps réel met une seconde
+       à prévenir. On REMPLACE la ligne au lieu de l'empiler : le temps réel a
+       pu recharger RESA pendant l'appel, et push() créerait un doublon. */
+    RESA=RESA.filter(x=>x.id!==r.id).concat(r);
+    slotChoisi=null;
+    rafraichir(true);              /* la table passe en « occupée » sur le plan */
+    confirmation(r,nom,tel);       /* puis on reste sur la fenêtre : récap + lien */
+  }catch(ex){err(SUP.lisible(ex));peindreCreneaux(focus)}
+  finally{btn.disabled=!SUP.ok}
+});
+async function annuler(champErr,telChamp){
+  const e=$(champErr);
+  const b=activeDe(focus)||prochaineDe(focus);
+  if(!b){e.textContent='Cette réservation n\'existe plus.';return rafraichir(true)}
+  const t=telPropre($(telChamp).value);
+  if(!t)return e.textContent='Saisissez le téléphone utilisé à la réservation.';
+  if(!pret)return e.textContent=raison();
+  /* C'est la BASE qui compare le numéro : le plan ne connaît pas le téléphone
+     des clients (c'est volontaire, cf. table privée `bookings`), donc la
+     vérification ne peut pas se faire ici. Un mauvais numéro est refusé
+     côté serveur, et rien n'est supprimé. */
+  try{await SUP.annuler(b.id,t)}
+  catch(ex){return e.textContent=SUP.lisible(ex)}
+  RESA=RESA.filter(x=>x.id!==b.id);m.close();rafraichir(true);
+}
+$('mcan').addEventListener('click',()=>annuler('minfoerr','mtel2'));
+$('mcan3').addEventListener('click',()=>annuler('msoonerr','mtel3'));
+['mx','mquit','mquit2'].forEach(id=>$(id).addEventListener('click',()=>m.close()));
+/* On NE rebascule PAS sur le jour du jour à la fermeture. Revenir en arrière
+   ferait disparaître de l'écran la réservation que le client vient de faire
+   pour DEMAIN, sans aucune confirmation : c'est le pire moment pour changer
+   l'écran sous ses yeux. Le plan reste sur la date consultée (la barre
+   d'état l'annonce : « Plan du … »), et gardeMinuit() ramènera le jour du jour
+   si la date affichée finit par passer.                                       */
+m.addEventListener('close',()=>{slotChoisi=null});
+
+/* ===== 9. ONGLETS ===== */
+function tabs(){const t=document.getElementById('tabs');t.innerHTML='';
+  ROOMS.forEach((r,i)=>{const b=document.createElement('button');b.textContent=r.name;
+    b.className='salle-tab'+(i===cur?' is-active':'');
+    if(i===cur)b.setAttribute('aria-current','true');
+    b.onclick=()=>{cur=i;focus=0;if(m.open)m.close();tabs();rafraichir(true)};t.append(b)})}
+
+/* ===== 10. RAFRAÎCHISSEMENT (peu coûteux) =====
+   Le statut est dérivé : rien n'est écrit pour « libérer » une table.
+   On ne redessine que si une signature change — sinon ça scintille. */
+let sig='';
+function rafraichir(force){
+  const k=maintenant();
+  /* jourVue entre dans la signature : changer de date doit repeindre le plan
+     même si les réservations sont identiques.                                   */
+  const s=k+'|'+cur+'|'+jourVue+'|'+RESA.map(b=>b.id+':'+b.debut+':'+b.fin).join(',');
+  const change=s!==sig;
+  if(!force&&!change)return;
+  sig=s;draw();panel();
+  /* Quelqu'un vient de réserver pendant que la fenêtre est ouverte : sans
+     ce repaint, un créneau peut rester affiché comme libre alors qu'il vient
+     d'être pris. On ne le fait QUE si les données ont changé, pour ne pas
+     reconstruire la grille toutes les 5 secondes (le client perdrait le focus
+     du clavier au milieu de sa saisie).                                        */
+  if(change&&focus&&m.dataset.mode==='book')remplirModale(focus);
+}
+/* La mise à l'échelle du plan (resize + ResizeObserver) vit dans script.js :
+   elle observe .floor et scale .floor-stage, base 500×340.                 */
+/* Passage de minuit : la date affichée ne peut pas rester dans le passé, le
+   sélecteur la refuse lui aussi. On rebascule sur le jour du jour.            */
+function gardeMinuit(){
+  if(jourVue&&jourVue<jourDe()){majPicker();return void voirJour(jourDe())}
+  rafraichir();
+}
+setInterval(gardeMinuit,5000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)gardeMinuit()});
+
+/* DIAGNOSTIC HORLOGE — à ouvrir une fois (F12 → Console) si l'heure affichée
+   semble décalée : compare le fuseau réellement résolu par le navigateur et
+   l'heure du poste avec l'heure de Tanger réellement affichée dans le panneau. */
+console.log('[horloge]',{
+  fuseauNavigateur:Intl.DateTimeFormat().resolvedOptions().timeZone,
+  decalagePostesMin:-new Date().getTimezoneOffset(),
+  heurePoste:hhmm(new Date().getHours()*60+new Date().getMinutes()),
+  heureTanger:hhmm(maintenant())});
+
+elaguer();
+tabs();rafraichir(true);
+majPicker();
+ annonceConfig();   /* la clé manque ? on le dit AVANT le premier clic */
+ if(typeof SUP!=='undefined')voirJour(jourDe()).then(connecter);
+ else console.error('[LA BOCA] SUP absent : supabase-config.js / supabase.js non chargés.');
+</script>
+</body></html>
