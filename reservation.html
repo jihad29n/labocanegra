@@ -133,6 +133,9 @@ dialog .sep{border:0;border-top:1px solid #333;margin:2px 0;width:100%}
   </header>
 
   <section class="floor-wrap">
+    <!-- Onglets de salle : compacts, au-dessus du plan -->
+    <nav class="salle-tabs" id="tabs" aria-label="Salles"></nav>
+
     <!-- #view = conteneur du plan (.floor.floor-container) ; #stage = le plan
          lui-même (.floor-stage), où le script de cette page dessine les tables.
          Fond/texture : 100 % CSS, défini par css/reservation-luxury.css. -->
@@ -146,8 +149,6 @@ dialog .sep{border:0;border-top:1px solid #333;margin:2px 0;width:100%}
       </div>
       <div id="stage" class="floor-stage"></div>
     </div>
-
-    <nav class="salle-tabs" id="tabs" aria-label="Salles"></nav>
 
     <footer class="status-bar" id="statusbar">
       <div class="status-item">
