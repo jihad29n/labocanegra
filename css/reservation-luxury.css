@@ -576,6 +576,7 @@ body.lux .floor-stage{background:transparent;position:relative;z-index:2}
   }
   .floor-legend span{white-space:nowrap}
   .foliage-bl{bottom:0}            /* overflow visible : le feuillage reste dans le cadre */
+  .foliage-bl{display:none}        /* mobile : on masque la décoration f4.png */
 }
 @media (prefers-reduced-motion:reduce){
   .lux *,.lux *::before,.lux *::after{transition:none!important;animation:none!important}
