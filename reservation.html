@@ -274,26 +274,20 @@ const OUVERTURE=13*60, DERNIER=20*60, DUREE=90, PAS=30;
 const MAX_JOURS=30;
 
 /* ===== 2. TEMPS =====
-   maintenant() = minutes depuis minuit à TANGER, en GMT+1 FIXE.
-   ATTENTION : ne pas utiliser « Africa/Casablanca ». Les règles IANA modélisent le
-   Maroc en UTC+00:00 avec un « heure d'été » négatif, donc à la saison
-   Africa/Casablanca = UTC+0 et l'horloge affiche une heure de retard ; le poste,
-   lui, est bien en GMT+1. Etc/GMT-1 = UTC+01:00 en permanence, sans ce piège :
-   l'heure affichée est celle du restaurant quel que soit le fuseau du téléphone
-   du visiteur, et il n'y a rien à corriger à la main au changement d'heure.     */
-const TZ='Etc/GMT-1';
-const HORLOGE=new Intl.DateTimeFormat('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
-let maintenant=()=>{const p=HORLOGE.formatToParts(new Date()),
-  h=+p.find(x=>x.type==='hour').value,m=+p.find(x=>x.type==='minute').value;return h*60+m};
-/* Repli si un navigateur très ancien ignore timeZone : heure locale du poste. */
-if(!HORLOGE.resolvedOptions().timeZone)
-  maintenant=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
+   maintenant() = minutes depuis minuit à TANGER, en GMT+1 FIXE — calculé par
+   ARITHMÉTIQUE depuis UTC (Date.now()+1 h), sans dépendre de la base IANA du
+   navigateur. C'est ce qui garantit que mobile, tablette et poste affichent la
+   MÊME heure : « Africa/Casablanca » est piégé (le Maroc y est modélisé à UTC+0
+   avec un « heure d'été » négatif) et certains navigateurs mobiles résolvent mal
+   « Etc/GMT-1 » puis basculent sur l'heure locale du téléphone (écart d'1 h).
+   Le calcul UTC+1 fixe n'a aucune dépendance ni aucun repli possible.         */
+const DECALAGE_TANGER_MS=3600e3;                 /* Tanger = UTC+01:00 en permanence */
+let maintenant=()=>{const d=new Date(Date.now()+DECALAGE_TANGER_MS);return d.getUTCHours()*60+d.getUTCMinutes()};
 const hhmm=v=>String(Math.floor(v/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0');
-/* jour de SERVICE ('AAAA-MM-JJ'), toujours calculé à Tanger comme l'heure.
-   Jamais toISOString() : c'est de l'UTC, et entre minuit et 01:00 GMT+1 cela
-   renverrait la date de la VEILLE pour une réservation du jour.            */
-const JOUR=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'});
-const jourDe=()=>JOUR.format(new Date());
+/* jour de SERVICE ('AAAA-MM-JJ'), toujours à Tanger comme l'heure. Le décalage
+   est ajouté AVANT le découpage ISO, donc aucune glissade de date à minuit
+   (toISOString() seul renverrait l'heure UTC, en retard d'1 h sur la réalité). */
+const jourDe=()=>new Date(Date.now()+DECALAGE_TANGER_MS).toISOString().slice(0,10);
 /* ARITHMÉTIQUE SUR LES DATES : les valeurs sont des chaînes « AAAA-MM-JJ » et
    se comparent donc entre elles directement ('2026-10-07' < '2026-10-08'), sans
    aucun objet Date et donc sans risque de décalage de fuseau.
