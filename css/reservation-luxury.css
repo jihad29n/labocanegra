@@ -526,6 +526,32 @@ body.lux .floor-stage{background:transparent;position:relative;z-index:2}
 #statusDate{color:var(--lux-ink);text-transform:capitalize}
 #statusTable{overflow-wrap:anywhere}
 
+/* ============================ CHAMP DATE ============================
+   Le navigateur peint le texte et l'icône calendrier du <input type="date">
+   selon color-scheme. On force le thème sombre + teinte crème lisible. */
+#mdate{
+  background:rgba(20,22,26,.6);      /* verre semi-transparent */
+  border:1px solid #4a4f5a;
+  border-radius:6px;
+  color-scheme:dark;                 /* popup native + icône en clair */
+}
+#mdate,
+#mdate::-webkit-datetime-edit{
+  color:#f5e7c8;                     /* crème/or clair sur fond sombre */
+  -webkit-text-fill-color:#f5e7c8;
+}
+#mdate::-webkit-calendar-picker-indicator{
+  filter:invert(1) sepia(.5) saturate(3) hue-rotate(-8deg);  /* icône or crème */
+  opacity:.9;
+  cursor:pointer;
+}
+#mdate:focus{
+  outline:2px solid var(--lux-gold);
+  outline-offset:1px;
+}
+#mdate::-webkit-inner-spin-button{display:none}
+#mdate::-webkit-clear-button{display:none}
+
 /* ============================ RESPONSIVE ============================ */
 /* index.html masque la navigation <=1024px ; ici on conserve le burger
    (menu déroulant) pour garder la navigation sur mobile. */
