@@ -274,18 +274,21 @@
     const statusTime = document.getElementById('statusTime');
     if (statusDate && statusTime) {
       const pageLang = document.documentElement.lang || 'fr';
-      /* Le plan et les créneaux sont calés sur Tanger (GMT+1, voir TZ dans
-         reservation.html) : l'horloge de la barre doit donner la MÊME heure,
-         pas celle du fuseau du visiteur. Sans TZ (autre page), repli local. */
-      const tz = (typeof TZ !== 'undefined') ? { timeZone: TZ } : {};
+      /* Le plan et les créneaux sont calés sur Tanger (UTC+1 fixe, voir
+         DECALAGE_TANGER_MS dans reservation.html). La barre doit donner la MÊME
+         heure, jamais celle du fuseau du téléphone. Même méthode que le plan :
+         math UTC+1, donc identique sur tous les écrans — pas de Intl.timeZone
+         ni de base IANA (source de l'écart d'1 h entre mobile et poste).
+         Hors reservation.html, DECAL=0 : on garde l'heure locale du visiteur. */
+      const DECAL = (typeof DECALAGE_TANGER_MS === 'number') ? DECALAGE_TANGER_MS : 0;
       const tick = () => {
-        const now = new Date();
+        const d = new Date(Date.now() + DECAL);
         statusDate.textContent = new Intl.DateTimeFormat(
-          pageLang, Object.assign({ weekday: 'long', day: 'numeric', month: 'long' }, tz)
-        ).format(now);
+          pageLang, { weekday: 'long', day: 'numeric', month: 'long' }
+        ).format(d);
         statusTime.textContent = new Intl.DateTimeFormat(
-          pageLang, Object.assign({ hour: '2-digit', minute: '2-digit' }, tz)
-        ).format(now);
+          pageLang, { hour: '2-digit', minute: '2-digit' }
+        ).format(d);
       };
       tick();
       setInterval(tick, 30000);
