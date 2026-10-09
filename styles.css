@@ -243,9 +243,11 @@ a.location__detail-value:active,
   top: 0;
   width: 100%;
   z-index: 100;
-  padding: 0.5rem 0%;
+  padding: 0 0%;
   display: flex;
   align-items: center;
+  background: #121212;
+  min-height: 28px;
 }
 
 .nav-container {
@@ -257,9 +259,9 @@ a.location__detail-value:active,
   margin: 0 auto;
   position: fixed;
   top: 0;
-  left:0;
- z-index: 100;
- background-color: #0707076e;
+  left: 0;
+  z-index: 100;
+  background-color: #121212;
   /* full-width fixed strip: only its real controls should catch taps */
   pointer-events: none;
 }
@@ -270,7 +272,7 @@ a.location__detail-value:active,
 
 .logo__text {
   font-family: var(--font-serif);
-  font-size: 20px;
+  font-size: 14px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   font-weight: 500;
@@ -284,18 +286,18 @@ a.location__detail-value:active,
 
 .main-nav__list {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .nav-link {
   font-family: var(--font-sans);
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 500;
   color: var(--color-ivory-dim);
   position: relative;
-  padding-bottom: 10px;
+  padding-bottom: 4px;
   transition: color var(--transition-fast);
   background: none;
   border: none;
@@ -314,7 +316,7 @@ a.location__detail-value:active,
   width: 100%;
   height: 2px;
   background: var(--color-gold);
-  margin-top: 8px;
+  margin-top: 4px;
   transition: all 0.3s ease;
 }
 
@@ -327,11 +329,11 @@ a.location__detail-value:active,
 .lang-switcher {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.25rem;
 }
 
 .lang-btn {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-medium-gray);
@@ -344,12 +346,12 @@ a.location__detail-value:active,
 
 .lang-switcher__sep {
   color: var(--color-dark-gray);
-  font-size: 0.6rem;
+  font-size: 0.55rem;
 }
 
 .nav-cta {
-  padding: 0.7rem 2rem;
-  font-size: 0.65rem;
+  padding: 0.45rem 1.25rem;
+  font-size: 0.55rem;
 }
 
 /* --- HEADER ARC IMAGE --- */
@@ -1036,7 +1038,7 @@ a.location__detail-value:active,
   left: 1rem;
   z-index: 2;
   font-family: var(--font-sans);
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   letter-spacing: 0.25em;
   color: var(--color-gold);
 }
@@ -1178,7 +1180,7 @@ a.location__detail-value:active,
 }
 
 .location__detail-label {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-gold);
@@ -1368,7 +1370,7 @@ a.location__detail-value:active,
 }
 
 .booking-modal__label {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-gold);
@@ -1672,7 +1674,7 @@ a.location__detail-value:active,
 }
 
 .footer__brand-tagline {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-medium-gray);
@@ -1732,15 +1734,15 @@ a.location__detail-value:active,
 
 /* --- RESPONSIVE --- */
 @media (max-width: 1024px) {
-  .site-header { padding: 1.2rem 2rem; }
+  .site-header { padding: 0 2rem; min-height: 30px; }
   .main-nav, .nav-cta, .nav-actions .lang-switcher { display: none; }
   .hero-video-container__circle { top: 120px; }
   .footer__grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
 }
 
 @media (max-width: 768px) {
-  .site-header { padding: 1rem 1.5rem; }
-  .logo__text { font-size: 1rem; }
+  .site-header { padding: 0 1.5rem; min-height: 30px; }
+  .logo__text { font-size: 0.85rem; }
   .site-footer { padding: 3rem 1.5rem 1.5rem; }
   .footer__grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .hero__title { font-size: clamp(2.5rem, 7vw, 3.5rem); }
@@ -1758,8 +1760,8 @@ a.location__detail-value:active,
 }
 
 @media (max-width: 480px) {
-  .site-header { padding: 0.8rem 1rem; }
-  .logo__text { font-size: 0.9rem; }
+  .site-header { padding: 0 1rem; min-height: 30px; }
+  .logo__text { font-size: 0.75rem; }
   .site-footer { padding: 2.5rem 1rem 1rem; }
   .btn { padding: 0.75rem 1.5rem; font-size: 0.6rem; }
   .btn--large { padding: 0.85rem 2rem; }
@@ -1786,7 +1788,7 @@ a.location__detail-value:active,
 }
 
 @media (max-width: 390px) {
-  .site-header { padding: 0.7rem 0.75rem; }
+  .site-header { padding: 0 0.75rem; min-height: 30px; }
   .logo__text { font-size: 0.8rem; }
   .site-footer { padding: 2rem 0.75rem 1rem; }
   .btn { padding: 0.65rem 1.25rem; font-size: 0.55rem; }

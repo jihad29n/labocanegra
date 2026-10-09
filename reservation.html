@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>LA BOCA NEGRA – Réservation</title>
@@ -91,20 +91,25 @@ dialog .sep{border:0;border-top:1px solid #333;margin:2px 0;width:100%}
 </head><body class="lux">
 <header class="site-header" id="site-header">
   <div class="nav-container">
-
     <a href="index.html" class="logo" aria-label="LA BOCA NEGRA — Accueil">
       <span class="logo__text">LA BOCA NEGRA</span>
     </a>
-
     <nav class="main-nav" id="mainNav" aria-label="Navigation principale">
       <ul class="main-nav__list">
-        <li class="main-nav__item"><a href="index.html" class="nav-link" data-i18n="nav.home">ACCUEIL</a></li>
-        <li class="main-nav__item"><a href="index.html" class="nav-link" data-i18n="nav.menu">LA CARTE</a></li>
-        <li class="main-nav__item"><a href="index.html" class="nav-link" data-i18n="nav.about">L'HISTOIRE</a></li>
-        <li class="main-nav__item"><a href="index.html" class="nav-link" data-i18n="nav.contact">CONTACT</a></li>
+        <li class="main-nav__item">
+          <a href="index.html" class="nav-link" data-i18n="nav.home">ACCUEIL</a>
+        </li>
+        <li class="main-nav__item">
+          <button type="button" class="nav-link open-menu-modal" data-i18n="nav.menu">LA CARTE</button>
+        </li>
+        <li class="main-nav__item">
+          <button type="button" class="nav-link open-history-modal" data-i18n="nav.about">L'HISTOIRE</button>
+        </li>
+        <li class="main-nav__item">
+          <button type="button" class="nav-link open-contact-modal" data-i18n="nav.contact">CONTACT</button>
+        </li>
       </ul>
     </nav>
-
     <div class="nav-actions">
       <div class="lang-switcher" role="group" aria-label="Sélection de langue">
         <button class="lang-btn active" data-lang="fr" aria-label="Français">FR</button>
@@ -117,10 +122,8 @@ dialog .sep{border:0;border-top:1px solid #333;margin:2px 0;width:100%}
         <span class="lang-switcher__sep" aria-hidden="true">|</span>
         <button class="lang-btn" data-lang="ar" aria-label="العربية">AR</button>
       </div>
-      <button type="button" class="btn btn--primary nav-cta is-active" id="navReserve" data-i18n="nav.reserve" aria-current="page">RÉSERVER</button>
-      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span></button>
+      <button type="button" class="btn btn--primary nav-cta" id="navReserve" data-i18n="nav.reserve" data-open-booking>RÉSERVER</button>
     </div>
-
   </div>
 </header>
 
